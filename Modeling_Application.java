@@ -4,4 +4,5 @@ public class Modeling_Application {
 		equations = new Equations();
 		equations.testDistributions();
 	}
+	
 }
