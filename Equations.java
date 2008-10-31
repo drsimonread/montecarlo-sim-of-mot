@@ -1,57 +1,67 @@
 import java.io.File;
 import java.io.PrintStream;
 import java.lang.Math;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-
-import sun.security.util.BigInt;
 
 public class Equations {
 	static final double Lambda_not = 780.24 * Math.pow(10, -9);
 	static final double k = 2 * Math.PI / Lambda_not;
 	static final double h_bar = 6.6260657E-34/ (2 * Math.PI);
 	static final double Gamma = 2 * Math.PI * 6E6;// 1 / tau;
-	static final double delta = (-1) * Gamma / 2;
-	static final double I_Isat = 2;
+	//static final double delta = (-1) * 9.2e7 / 2;
+	static final double I_Isat = .5;
 	static final double mass = 87.4678 * 1.661E-27;
 	static final double boltzman = 1.3806503E-23;
 	static final double term1 = h_bar * k * Gamma / 2; 
 	int Lcnt, Rcnt;
+	double delta; 
+//	double[] prob = new double[3000];
 	MyRandom rand = new MyRandom();
 
 	public void testDistributions() {
 		double myVelocity, vel;
 		double[] myArr = new double[10000];
 		double[] herArr = new double[10000];
-		//double x, y, z, a, b;
 		Lcnt = Rcnt = 0;
-		
+		long start = System.nanoTime();
 		PrintStream datafile;
 		try {
 			datafile = new PrintStream(new File("data.csv"));
-			datafile.println("velocity" + "," + "bin");	
+//			datafile.println("velocity" + "," + "bin");
+			double[][]TvsDetune = new double[2][20];
+			for (int k = 1000000; k < 2e7; k += 1e6 ){
+				delta = -k;
 			for(int i = 0; i < 10000; i++){
 				myVelocity = rand.nextUniform(-5, 5);
 				vel = myVelocity;
+				herArr[i] = vel;
 				for(int j = 0; j < 30000; j++){
 					myVelocity = senario(myVelocity);
 //					if (i % 1000 == 0 && j % 10000 == 0){
 //						System.out.println(i + ", " + j);
 //					}
+//					datafile.println(prob[i]);
 				}
-				//datafile.println(myVelocity);
+//				datafile.println(myVelocity);
 				myArr[i] = myVelocity;
-				herArr[i] = vel;
+				double l = k / 1e6;
+				TvsDetune[0][(int) l] = delta;
+				TvsDetune[1][(int) l] = T_calc(stdDev(myArr));
 			}
+//			datafile.println(delta + "," + T_calc(stdDev(myArr)));			
+			plots.histogram(myArr, stdDev(myArr), mean(myArr), "Final Velocity " + k/1e6);
+			}
+			plots.scatter(TvsDetune, "Temp vs Detuning");
 			datafile.close();
 		} catch (Exception caught) {
 			System.err.println(caught);
 		}
-		plots.histogram(herArr, mean(herArr), stdDev(herArr), "Initial Velocity");
-		plots.histogram(myArr, stdDev(myArr), mean(myArr), "Final Velocity");
+//		plots.histogram(herArr, mean(herArr), stdDev(herArr), "Initial Velocity");
+//		plots.histogram(myArr, stdDev(myArr), mean(myArr), "Final Velocity");
 		System.out.println(Lcnt + ", " + Rcnt);
-		System.out.println("Final Temp:  " + T_calc(stdDev(myArr)));
+//		System.out.println("Final Temp:  " + T_calc(stdDev(myArr)));
+		long end = System.nanoTime();
+		double time =  ((end - start)/ 1e9)/60;
+		System.out.println("Run Time:  " + time);
 	}
 
 	public double V_calc(double temp) {
@@ -104,61 +114,43 @@ public class Equations {
 	}
 
 	public double Prob_Emit() { 
-		// Gives a random double between 0 and 1 which is
+		// Gives a random double between 0 and PI which is
 		// the probability of the direction of emission.
-		return rand.nextDouble();
+		return Math.PI * rand.nextDouble();
 	}
 
 	public double senario(double velocity) {
-		double V_photon, Prob, Rand_prob_R, Rand_prob_L, P_Absorb_R, P_Absorb_L;
-		boolean P_emit, left, right;
+		double V_photon, P_Absorb_R, P_Absorb_L;
+		boolean left, right;
 		right = false;
 		left = false;
 		V_photon = h_bar * k / mass;
-		Prob = rand.nextDouble();
-		// computes probability of absorption from the right.
 		P_Absorb_R = Prob_Absorb(velocity, true);
-		// computes the probability of absorption from the left.
+		// computes probability of absorption from the right.
 		P_Absorb_L = Prob_Absorb(velocity, false);
-		Rand_prob_R = rand.nextDouble();
-		// random probability from the right.
-		Rand_prob_L = rand.nextDouble();
-		// random probability from the left.
-
-		if (P_Absorb_R < Rand_prob_R) {
-			// tests for absorption, from the right.
-			right = true;
-		}
-		if (P_Absorb_L < Rand_prob_L) {
-			// tests for absorption, from the left.
-			left = true;
-		}
+		// computes the probability of absorption from the left.
+		right = P_Absorb_R > rand.nextDouble();
+		// tests for absorption, from the right.
+		left = P_Absorb_L > rand.nextDouble();
+		// tests for absorption, from the left.
+		
 		if (right && left) {
 			//handles the case when photons from both beams reach the atom simultaneously.
-			right = Prob > 0.5;
-			left = !right;
+			right = rand.nextBoolean();
+			left = right;
 		}
 		if (right) {
 			//Calculates the change in velocity of the atom from an absorption event from the right.
-			velocity = velocity - V_photon;
+			velocity = velocity + V_photon;
 			Rcnt = Rcnt + 1;
-		} else {
+		}
+		if (left){
 			//Calculates the change in velocity of the atom from an absorption event from the left.
-			velocity = velocity + V_photon;
-			Lcnt = Lcnt + 1;
-		}
-		if (Prob_Emit() > 0.5){
-			//calls the random probability of emission method.
-			P_emit = true;
-		}else{
-			P_emit = false;
-		}
-		if (P_emit){
-			//Calculates the change in velocity of the atom from an emission event from the right.
 			velocity = velocity - V_photon;
-		}else{
-			//Calculates the change in velocity of the atom from an emission event from the left.
-			velocity = velocity + V_photon;
+			Lcnt = Lcnt + 1;
+		}	
+		if(left || right){
+			velocity = velocity - V_photon*Math.cos(Prob_Emit());
 		}
 		return velocity;
 	}
