@@ -25,7 +25,6 @@ public class plots {
 	        }
 		}
 		System.out.println(min + ", " + max);
-//		int binsize = 2*max/;
 		mydata.addSeries("freq", data, 500, min, max);
 		// create a chart...
 		JFreeChart chart = ChartFactory.createHistogram(name, "Velocity", "Frequency",
@@ -36,36 +35,8 @@ public class plots {
 		frame.setVisible(true);
 	}
 	
-	public static void myHistogram(double[] data, double mean, double stdDev, String name) {
-		// create a dataset...
-		double min, max;
-		min = max = data[0];
-		HistogramDataset mydata = new HistogramDataset();
-		for (int i = 0; i < data.length; i++){
-			if (data[i] > max) {
-	            max = data[i];   // new maximum
-	        }else if (data[i] < min){
-	        	min = data[i];
-	        }
-		}
-		System.out.println(min + ", " + max);
-//		int binsize = 2*max/;
-		mydata.addSeries("freq", data, 500, min/10, max/10);
-		// create a chart...
-		JFreeChart chart = ChartFactory.createHistogram(name, "Velocity", "Frequency",
-				mydata, PlotOrientation.VERTICAL, true, true, false);
-		// create and display a frame...
-		ChartFrame frame = new ChartFrame(name, chart);
-		frame.pack();
-		frame.setVisible(true);
-	}
 	public static void scatter(double[][] data, String name){
-		//double[][] mydata = new double[2][10000];  
 		DefaultXYDataset myscater = new DefaultXYDataset(); 
-//		for (int i = 0; i < data.length; i++){
-//			mydata[0][i] = i;
-//			mydata[1][i] = data[i];	
-//		}
 		myscater.addSeries("Velocity", data);
 		JFreeChart chart = ChartFactory.createScatterPlot("Velocity", "Velocity", "Event", 
 				myscater, PlotOrientation.VERTICAL, true, true, false);
@@ -74,7 +45,7 @@ public class plots {
 		frame.setVisible(true);
 	}
 	
-	public static void myScatter(double[] data, String name){
+	public static void truncatedScatter(double[] data, String name, String xLabel, String yLabel){
 		double min, max;
 		min = max = data[0];
 		HistogramDataset mydata = new HistogramDataset();
@@ -90,25 +61,52 @@ public class plots {
 		JFreeChart chart = ChartFactory.createHistogram(name, "Velocity", "Frequency",
 				mydata, PlotOrientation.VERTICAL, true, true, false);
 		
-		JFreeChart mychart = ChartFactory.createScatterPlot("Velocity", "Velocity", "Event", 
-				getDataValues(chart), PlotOrientation.VERTICAL, true, true, false);
+		DefaultXYDataset otherdata = new DefaultXYDataset();
+		otherdata.addSeries("freq", truncateArray(getDataValues(chart)));
+		
+		JFreeChart mychart = ChartFactory.createScatterPlot(name, xLabel, yLabel, 
+				otherdata, PlotOrientation.VERTICAL, true, true, false);
 		
 		ChartFrame frame = new ChartFrame(name, mychart);
 		frame.pack();
 		frame.setVisible(true);
 	}
 	
-	public static XYDataset getDataValues(JFreeChart arg){
+	public static double[][] truncateArray(double[][] arr){
+		double min1, min2, max;
+		int min1Index, min2Index;
+		min1Index = min2Index = 0;
+		min1 = min2 = max = arr[1][0];
+		double [][] temp = new double [2][arr.length];
+		for(int i = 0; i < arr. length; i++){
+			if (arr[1][i] < min1){
+				if (arr[1][i-1] > min1 && min1 < arr[1][i+1]){
+					min1 = arr[1][i];
+				}
+				min1Index = i;	
+			}else if(arr[1][i] > max){
+				max = arr[1][i];
+				if (arr[1][i] < min2){
+					if (arr[1][i-1] > min2 && min2 < arr[1][i+1]){
+						min2 = arr[1][i];
+					}
+					min2Index = i;
+				}
+			}
+		}	
+		for(int j = 0; j < min1Index-min2Index; j++){
+			System.arraycopy(arr, min1Index, temp, j, (min1Index-min2Index));
+		}
+		return temp;
+	}
+	
+	public static double[][] getDataValues(JFreeChart arg){
 		XYDataset dataSet = arg.getXYPlot().getDataset();
 		double[][] arr = new double [dataSet.getItemCount(0)][dataSet.getItemCount(1)];
-//		arr[1][0] = 0;
-//		arr[1][dataSet.getItemCount(0)] = 0;
 		for (int i = 1; i < dataSet.getItemCount(0); i++){
 			arr[0][i] = dataSet.getXValue(0, i);
 			arr[1][i] = dataSet.getYValue(1, i);
 		}
-		DefaultXYDataset mydata = new DefaultXYDataset();
-		mydata.addSeries("freq", arr);
-		return mydata;
+		return arr;
 	}
 }

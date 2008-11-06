@@ -58,8 +58,8 @@ public class Equations {
 			System.err.println(caught);
 		}
 		plots.histogram(herArr, mean(herArr), stdDev(herArr), "Initial Velocity");
-		plots.myHistogram(myArr, stdDev(myArr), mean(myArr), "Final Velocity");
-		plots.myScatter(myArr, "TEST");
+		plots.histogram(myArr, stdDev(myArr), mean(myArr), "Final Velocity");
+		plots.truncatedScatter(myArr, "TEST1", "TEST2", "TEST3");
 		System.out.println(Lcnt + ", " + Rcnt);
 		long end = System.nanoTime();
 		double time =  ((end - start)/ 1e9)/60;
