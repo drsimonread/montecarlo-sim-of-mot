@@ -5,10 +5,13 @@ import java.io.ObjectInputStream;
 public class DataAnalysis {
 	
 	public static void main(String[] args){
-		
 		Configurations data;
 		ObjectInputStream file;
+		double[][]temp;
+		double[][]temperatureVSDetuning = new double [2][10];
 		double t;
+		SimulationData Sim;
+		double[][]smoothData;
 		
 		try{
 			file = new ObjectInputStream(new FileInputStream("simulation_data.dat"));
@@ -16,23 +19,39 @@ public class DataAnalysis {
 			file.close();
 
 			for(int k = 0; k < data.size(); k++){
-				SimulationData Sim = data.get(k);
+				Sim = data.get(k);
 				int range = Sim.size();
-				double[][]smoothData = new double[2][range];
+				smoothData = new double[2][range];		
 				double i_min = min(Sim.toArray());
 				double i_max = max(Sim.toArray());
 				double step = (i_max-i_min)/range;
-				System.out.println("Frequency is: " + Sim.frequency());				
+				System.out.println("Frequency is: " + Sim.frequency());
+				
 				for(int i = 0; i < smoothData[0].length; i++) {
 					t = i_min + (i * step);
 					smoothData[0][i] = t;
 					smoothData[1][i] = Math.abs(KDE.f_hat(Sim, t));					
 				}
-//			plots.myLine(smoothData, "Kernel Density Estimation Plot, Detuning = " + Sim.frequency(), "Velocities", "Probability");
 			
-			plots.myLine(truncateData(smoothData), "Test", "Velocity", "Probability");
-//			plots.histogram(Sim.toArray(), "Histogram of Raw Data");
+				
+				temperatureVSDetuning  = new double [2][Sim.size()];
+				temp = new double [2][Sim.size()];
+				temp  = truncateData(smoothData);			
+				
+//				temperatureVSDetuning[0][k] = Sim.frequency();
+//				System.out.println("Freq..." + temperatureVSDetuning[0][k]);
+//				
+//				temperatureVSDetuning[1][k] = Equations.T_calc(stdDev(temp[1]));
+//				System.out.println("Temp..." + temperatureVSDetuning[1][k]);
+				
+//				plots.myLine(smoothData, "Kernel Density Estimation Plot, Detuning = " + Sim.frequency(), "Velocities", "Probability");
+//				plots.myLine(truncateData(smoothData), "Kernel Density Estimation Plot - Exploded, Detuning = " + Sim.frequency(), "Velocity", "Probability");
+//				plots.histogram(Sim.toArray(), "Histogram of Raw Data");
+
 			}
+			
+			plots.scatter(temperatureVSDetuning, "Temperature VS. Detuning", "Detuning", "Temperature");
+			
 			System.out.println("DONE!");
 		}catch(IOException caught){
 			System.err.println(caught);
@@ -70,6 +89,7 @@ public class DataAnalysis {
 	public static double[][] truncateData(double[][] data){
 		int indexATmax = 0, lt = 0, rt = 0;
 		int length;
+		double min;
 		double max = 0.0;
 		
 		for(int i = 0; i < data[1].length; i++){
@@ -78,36 +98,29 @@ public class DataAnalysis {
 				indexATmax = i;
 			}
 		}
-		System.out.println(indexATmax);
-		
-//		for(int i = indexATmax - 10; i < indexATmax + 10; i++){
-//			System.out.println("Index is..." + i + " Value is..." + data[1][i]);
-//		}
-		
-		double min = data[1][indexATmax];
-		System.out.println("Max is..." + (min) + " index..." + indexATmax);
+//		System.out.println(indexATmax);
+				
+		min = data[1][indexATmax];
 		for (int i = indexATmax; i < 10000; i++){
 			if((data[1][i] < data[1][i + 3])){
 				min = data[1][i];
 				rt = i;
-				System.out.println("rt = " + rt);
+//				System.out.println("rt = " + rt);
 				break;
 			}
 		}
 		
 		min = data[1][indexATmax];
-		System.out.println("Max is..." + (min) + " index..." + indexATmax);
 		for (int i = indexATmax; i > 0; i--){
 			if((data[1][i] < data[1][i - 3])){
 				min = data[1][i];
 				lt = i;
-				System.out.println("lt = " + lt);
+//				System.out.println("lt = " + lt);
 				break;
 			}
 		}
 		
 		length = rt-lt;
-		System.out.println("array length..." + length);
 		double[][] temp = new double[2][length];
 		for(int i = 0; i < length; i++){
 			temp[0][i] = data[0][lt + i];
