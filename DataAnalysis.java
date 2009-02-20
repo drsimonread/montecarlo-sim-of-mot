@@ -1,59 +1,117 @@
-import java.lang.reflect.Array;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 
 public class DataAnalysis {
+	
+	public static void main(String[] args){
+		
+		Configurations data;
+		ObjectInputStream file;
+		double t;
+		
+		try{
+			file = new ObjectInputStream(new FileInputStream("simulation_data.dat"));
+			data = (Configurations) file.readObject();
+			file.close();
 
-	public static double max(double[] arr){
+			for(int k = 0; k < data.size(); k++){
+				SimulationData Sim = data.get(k);
+				int range = Sim.size();
+				double[][]smoothData = new double[2][range];
+				double i_min = min(Sim.toArray());
+				double i_max = max(Sim.toArray());
+				double step = (i_max-i_min)/range;
+				System.out.println("Frequency is: " + Sim.frequency());				
+				for(int i = 0; i < smoothData[0].length; i++) {
+					t = i_min + (i * step);
+					smoothData[0][i] = t;
+					smoothData[1][i] = Math.abs(KDE.f_hat(Sim, t));					
+				}
+//			plots.myLine(smoothData, "Kernel Density Estimation Plot, Detuning = " + Sim.frequency(), "Velocities", "Probability");
+			
+			plots.myLine(truncateData(smoothData), "Test", "Velocity", "Probability");
+//			plots.histogram(Sim.toArray(), "Histogram of Raw Data");
+			}
+			System.out.println("DONE!");
+		}catch(IOException caught){
+			System.err.println(caught);
+		}catch(ClassNotFoundException caught){
+			System.err.println(caught);
+		}
+	}
+
+	public static double max(double[] doubles){
 		double max;
-		max = arr[0];
-		for (int i = 0; i < arr.length; i++){
-			if (arr[i] > max) {
-	            max = arr[i];   // new maximum
+		int i_max;
+		max = doubles[0];
+		i_max = doubles.length;
+		for (int i = 0; i < i_max; i++){
+			if (doubles[i] > max) {
+	            max = doubles[i];   // new maximum
 	        }
 		}
 		return max;
 	}
 	
-	public static double min(double[] arr){
+	public static double min(double[] data){
 		double min;
-		min = arr[0];
-		for (int i = 0; i < arr.length; i++){
-			if (arr[i] < min) {
-	            min = arr[i];   // new minimum
+		int i_max;
+		i_max = data.length;
+		min = data[0];
+		for (int i = 0; i < i_max; i++){
+			if (data[i] < min) {
+	            min = data[i];   // new minimum
 	        }
 		}
 		return min;
 	}
 	
-	public static double[][] truncateArray(double[][] arr){
-		double min1, min2, max1, max2;
-		int min1Index, min2Index;
-		min1Index = min2Index = 0;
-		min1 = min2 = max1 = max2 = 0;
-		double [][] temp = new double [2][25];
-//		for(int i = 0; i < arr. length; i++){
-//			if(arr[1][i] > max1){
-//				max1 = arr[1][i];
-//				if (arr[1][i] < min1){
-//	//				if (arr[1][i-1] > min1 && min1 < arr[1][i+1]){
-//						min1 = arr[1][i];
-//						min1Index = i;
-//						System.out.println(min1 + "min, " + min1Index);
-//	//				}
-//				}else if(arr[1][i] > max2){
-//					max2 = arr[1][i];
-//					if (arr[1][i] < min2){
-//	//					if (arr[1][i-1] > min2 && min2 < arr[1][i+1]){
-//							min2 = arr[1][i];
-//							min2Index = i;
-//							System.out.println(min2 + ", " + min2Index);
-//	//					}	
-//					}
-//				}
-//			}
-//		}	
-		for(int j = 0; j < 15; j++){
-			temp[0][j] = arr[0][j + 25];
-			temp[1][j] = arr[1][j + 25];
+	public static double[][] truncateData(double[][] data){
+		int indexATmax = 0, lt = 0, rt = 0;
+		int length;
+		double max = 0.0;
+		
+		for(int i = 0; i < data[1].length; i++){
+			if (data[1][i] > max){
+				max = data[1][i];
+				indexATmax = i;
+			}
+		}
+		System.out.println(indexATmax);
+		
+//		for(int i = indexATmax - 10; i < indexATmax + 10; i++){
+//			System.out.println("Index is..." + i + " Value is..." + data[1][i]);
+//		}
+		
+		double min = data[1][indexATmax];
+		System.out.println("Max is..." + (min) + " index..." + indexATmax);
+		for (int i = indexATmax; i < 10000; i++){
+			if((data[1][i] < data[1][i + 3])){
+				min = data[1][i];
+				rt = i;
+				System.out.println("rt = " + rt);
+				break;
+			}
+		}
+		
+		min = data[1][indexATmax];
+		System.out.println("Max is..." + (min) + " index..." + indexATmax);
+		for (int i = indexATmax; i > 0; i--){
+			if((data[1][i] < data[1][i - 3])){
+				min = data[1][i];
+				lt = i;
+				System.out.println("lt = " + lt);
+				break;
+			}
+		}
+		
+		length = rt-lt;
+		System.out.println("array length..." + length);
+		double[][] temp = new double[2][length];
+		for(int i = 0; i < length; i++){
+			temp[0][i] = data[0][lt + i];
+			temp[1][i] = data[1][lt + i];
 		}
 		return temp;
 	}
@@ -65,7 +123,8 @@ public class DataAnalysis {
 	
     public static double mean(double[] arg){
 		double sum = 0;
-		for(int i = 0; i < arg.length; i++){
+		int i_max  = arg.length;
+		for(int i = 0; i < i_max; i++){
 			sum = sum + arg[i];		
 		}
 		return sum/arg.length;
@@ -75,7 +134,8 @@ public class DataAnalysis {
 		double myMean = mean(arg);
 		double dev, sqDev, sum;
 		sum = 0;
-		for(int i = 0; i < arg.length; i++){
+		int i_max  = arg.length;
+		for(int i = 0; i < i_max; i++){
 			dev = myMean - arg[i];
 			sqDev = square(dev);
 			sum = sum + sqDev;		
@@ -86,7 +146,8 @@ public class DataAnalysis {
 	public static void LSBF(double [][] arr){
 		double p, q, r, s, d, a, b;
 		p = q = r = s = d = a = b = 0;
-		for (int k = 0; k < arr.length; k++){
+		int i_max  = arr.length;
+		for (int k = 0; k < i_max; k++){
 			p = p + arr[0][k];
 //			System.out.println(arr[0][k]);
 			q = q + arr[1][k];
@@ -121,7 +182,6 @@ public class DataAnalysis {
 		for(int i = 0; i < numOfbins; i++){
 			data[0][i] = bins[i];
 			data[1][i] = freq[i];
-//			System.out.println(data[0][i] + ", " + data[1][i]);
 		}
 		return data;
 	}
