@@ -66,7 +66,7 @@ public class Equations{
 		return Math.sqrt(2 * boltzman * temp / mass);
 	}
 
-	public double T_calc(double velocity) {
+	public static double T_calc(double velocity) {
 		/**
 		 *  Calculates the temperature given a velocity.
 		 */
