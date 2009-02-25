@@ -66,13 +66,6 @@ public class Equations{
 		return Math.sqrt(2 * boltzman * temp / mass);
 	}
 
-	public static double T_calc(double velocity) {
-		/**
-		 *  Calculates the temperature given a velocity.
-		 */
-		return DataAnalysis.square(velocity) * mass / (2 * boltzman);
-	}
-
 	public double F_calc(double velocity, boolean direction) {
 		/**
 		 *  Calculates the force of an atom given a velocity.
