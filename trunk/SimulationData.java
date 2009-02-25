@@ -35,10 +35,6 @@ public class SimulationData implements Serializable, Iterable<Double>{
 		return velocities.size();
 	}
 	
-//	public void trim(){
-//		
-//	}
-	
 	public double getValue(int index){
 		return velocities.get(index);
 	}

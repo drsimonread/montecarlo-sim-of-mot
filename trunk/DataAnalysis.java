@@ -7,11 +7,12 @@ public class DataAnalysis {
 	public static void main(String[] args){
 		Configurations data;
 		ObjectInputStream file;
-		double[][]temp;
-		double[][]temperatureVSDetuning = new double [2][10];
-		double t;
+//		tempVSdetuning TvsD  = new tempVSdetuning();
+//		double[][]temperatureVSDetuning = new double [2][10];
+//		double[][]smoothData;		
+//		double[][]suspectData;
+//		double t;
 		SimulationData Sim;
-		double[][]smoothData;
 		
 		try{
 			file = new ObjectInputStream(new FileInputStream("simulation_data.dat"));
@@ -21,10 +22,50 @@ public class DataAnalysis {
 			for(int k = 0; k < data.size(); k++){
 				Sim = data.get(k);
 				int range = Sim.size();
-				smoothData = new double[2][range];		
+//				smoothData = new double[2][range];		
+				double[][] P_X = new double [2][range];
+				double[][] diff = new double [2][range];
+				double[][] rawData = new double [2][range];
+				double[][] normData = new double[2][range];
+				
 				double i_min = min(Sim.toArray());
 				double i_max = max(Sim.toArray());
 				double step = (i_max-i_min)/range;
+				
+				double V1, V2, V3, v, A, B, C, p1, p2, p3;
+
+				V1 = 13.78;
+				V2 = Equations.V_calc(100e-6);
+				V3 = 1.5;
+				A = 0.012;
+				B = 0.13;
+				C = 0.012;
+				rawData = binnedData(Sim.toArray(), range);
+				
+				for(int i = 0; i < range; i++){
+					
+					v = i_min + i*step;
+					p1 = A/(Math.sqrt(Math.PI)*V1)*Math.exp(-((v*v)/(V1*V1)));
+					p2 = B/(Math.sqrt(Math.PI)*V1)*Math.exp(-((v*v)/(V2*V2)));
+					p3 = C/(Math.sqrt(Math.PI)*V1)*Math.exp(-((v*v)/(V3*V3)));
+					
+					P_X[0][i] = v;
+					P_X[1][i] = p1 + p2 - p3;	
+					
+					normData[0][i] = rawData[0][i];
+					normData[1][i] = rawData[1][i]/range;
+					
+					diff[0][i] = v;
+					diff[1][i] = square(P_X[1][i] - normData[1][i]);
+				}
+				System.out.println("max diff..." + max(diff[1]));
+				plots.myLine(P_X, "Plot of Fitting Equation", "Velocity", "Probability");
+				plots.myLine(normData, "Normalized Raw Data", "Velocity", "Probability");
+				plots.myLine(diff, "Difference", "Velocity", "Probability");
+				
+/**				plots.myLine(rawData, "Raw Data", "Velocity", "Probability");
+				plots.histogram(Sim.toArray(), "Histogram of Raw Data");
+				
 				System.out.println("Frequency is: " + Sim.frequency());
 				
 				for(int i = 0; i < smoothData[0].length; i++) {
@@ -32,25 +73,22 @@ public class DataAnalysis {
 					smoothData[0][i] = t;
 					smoothData[1][i] = Math.abs(KDE.f_hat(Sim, t));					
 				}
-			
 				
-				temperatureVSDetuning  = new double [2][Sim.size()];
-				temp = new double [2][Sim.size()];
-				temp  = truncateData(smoothData);			
+				suspectData = new double [2][Sim.size()];
+				suspectData  = truncateData(smoothData);
+				System.out.println("Detuning is..." + Sim.frequency() + ", Temperature is..." + stdDev(suspectData[1]));
+				TvsD.addTvsd(Math.abs(Sim.frequency()), stdDev(suspectData[1]));			
 				
-//				temperatureVSDetuning[0][k] = Sim.frequency();
-//				System.out.println("Freq..." + temperatureVSDetuning[0][k]);
-//				
-//				temperatureVSDetuning[1][k] = Equations.T_calc(stdDev(temp[1]));
-//				System.out.println("Temp..." + temperatureVSDetuning[1][k]);
-				
-//				plots.myLine(smoothData, "Kernel Density Estimation Plot, Detuning = " + Sim.frequency(), "Velocities", "Probability");
-//				plots.myLine(truncateData(smoothData), "Kernel Density Estimation Plot - Exploded, Detuning = " + Sim.frequency(), "Velocity", "Probability");
-//				plots.histogram(Sim.toArray(), "Histogram of Raw Data");
-
+				plots.myLine(smoothData, "Kernel Density Estimation Plot, Detuning = " + Sim.frequency(), "Velocities", "Probability");
+				plots.myLine(truncateData(smoothData), "Kernel Density Estimation Plot - Exploded, Detuning = " + Sim.frequency(), "Velocity", "Probability");
+				plots.histogram(Sim.toArray(), "Histogram of Raw Data");
+*/				
+				k = data.size();
 			}
 			
-			plots.scatter(temperatureVSDetuning, "Temperature VS. Detuning", "Detuning", "Temperature");
+//			temperatureVSDetuning = TvsD.toArray();
+//			plots.myLine(temperatureVSDetuning, "Temperature VS. Detuning", "Detuning", "Temperature");
+			
 			
 			System.out.println("DONE!");
 		}catch(IOException caught){
@@ -105,20 +143,22 @@ public class DataAnalysis {
 			if((data[1][i] < data[1][i + 3])){
 				min = data[1][i];
 				rt = i;
-//				System.out.println("rt = " + rt);
+				
 				break;
 			}
 		}
+		System.out.println("rt = " + data[0][rt]);
 		
 		min = data[1][indexATmax];
 		for (int i = indexATmax; i > 0; i--){
 			if((data[1][i] < data[1][i - 3])){
 				min = data[1][i];
 				lt = i;
-//				System.out.println("lt = " + lt);
+				
 				break;
 			}
 		}
+		System.out.println("lt = " + data[0][lt]);
 		
 		length = rt-lt;
 		double[][] temp = new double[2][length];
