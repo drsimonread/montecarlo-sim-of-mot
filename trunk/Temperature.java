@@ -16,6 +16,11 @@ public class Temperature {
 		tempList.add(T_calc());
 	}
 	
+	public void addKnownTemperature(double temperature){
+		stdDev = Equations.V_calc(temperature);
+		tempList.add(temperature);
+	}
+	
 	public double getTemperature(){
 		return this.T_calc();
 	}

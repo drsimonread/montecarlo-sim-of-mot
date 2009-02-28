@@ -20,7 +20,9 @@ public class Equations{
 		Configurations configs;
 		SimulationData data;
 		ObjectOutputStream file;
-		double initial_temp = 1, initialVelocity;	//units of Kelvin, then meters per second.
+		Temperature initial_temp = new Temperature();
+		initial_temp.addKnownTemperature(1);
+		double initialVelocity;//initial_temp = 1, 	//units of Kelvin, then meters per second.
 		long start, end;
 		double time;
 		start = System.nanoTime();
@@ -30,15 +32,15 @@ public class Equations{
 		for(int s = 0; s < 10; s++ ){
 			System.out.println("Starting configuration " + s + ".");
 			delta = -(0.5e6 + (s * step));
-			data = new SimulationData(delta);
+			data = new SimulationData(delta);//, initial_temp);
 			for(int i = 0; i < 10000; i++){
-				initialVelocity = rand.nextGaussian(0, V_calc(initial_temp));
+				initialVelocity = rand.nextGaussian(0, V_calc(initial_temp.getTemperature()));
 				for(int j = 0; j < 30000; j++){
 					initialVelocity = senario(initialVelocity);
 				}
 				data.addVelocity(initialVelocity);
 			}
-			configs.addConfiguration(data);
+			configs.addConfiguration(data);//, initial_temp);
 		}
 		
 		end = System.nanoTime();
