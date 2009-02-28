@@ -8,10 +8,13 @@ public class DataGeneration {
 		SimulationData data;
 		Configurations config;
 		ObjectOutputStream file;
+		Temperature T = new Temperature();
+		T.addKnownTemperature(1);
+		double detuning = 3e6;
 		
 		config = new Configurations();
 		for(int i = 0; i < 1; i++){
-			data = new SimulationData(1);
+			data = new SimulationData(1.0);
 			
 			for(int j = -10; j < 0; j++){
 				data.addVelocity(j+10);
