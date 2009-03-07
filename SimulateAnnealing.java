@@ -30,27 +30,36 @@ public class SimulateAnnealing{
 	static final double k = 2 * Math.PI / Lambda_not;
 	static final double Gamma = 6e6;//2 * Math.PI * 3E6;// 1 / tau;
 	private static SimulationData Sim; 
-	private static double[][] rawData;
 	private static double[][] P_X;
-
-	public SimulateAnnealing(SimulationData Sim){
-		SimulateAnnealing.Sim = Sim;
+	private static double[][] normData;
+	private static double Z = 0;//constant of proportionality.
+	private static double e_initial, Ai, Bi, Ci, V1i, V2i, V3i;
+	
+	public SimulateAnnealing(SimulationData Sim_){
+		Sim = Sim_;
 		
 		ArrayList<Double> parameters = new ArrayList<Double>();
 		int b = 0, range = Sim.size();
+		double[][] rawData;
+		normData = new double [2][range]; 
 		P_X = new double [2][range];
+		double[][]p_x = new double[2][range];
+		double[][]kde = KDE.SmoothIt(Sim); 
 		double e, cnt = 1, variable, up = 0, down = 0, temp;
 		double V1, V2, V3, A, B, C, Ti, Tf, Err, T = 10000;
 		Random r = new Random();
-		
+		double prob = 0;
+		LineGraph myLine;
+		KDE.SmoothIt(Sim);
+
 		Ti = 1;
 		Tf = 100e-6;
-		V1 = Equations.V_calc(Ti);
-		V2 = Equations.V_calc(Tf);
-		V3 = (2*Gamma)/k;//should be capture velocity, Foot page 190.
-		A = 0.1;
-		B = A*10;
-		C = A;
+		V1 = V1i = Equations.V_calc(Ti);
+		V2 = V2i = Equations.V_calc(Tf);
+		V3 = V3i = (2*Gamma)/k;//should be capture velocity, Foot page 190.
+		A = Ai = 0.012;
+		B = Bi = 0.13;//A*10;
+		C = Ci = 0.012;//A;
 		
 		parameters.add(V1);
 		parameters.add(V2);
@@ -59,14 +68,34 @@ public class SimulateAnnealing{
 		parameters.add(B);
 		parameters.add(C);
 		
+		rawData = kde;//DataAnalysis.binnedData(Sim.toArray(), range);
+		
 		SimulateAnnealing.P_X = expCurve(parameters);
-		Err = e = sumSqErr();
-//		System.out.println("Initial Error is..." + e);
+		
+		for(int i  = 0; i < range; i++){
+			p_x[0][i] = P_X[0][i];
+			p_x[1][i] = P_X[1][i];
+			Z = Z + rawData[1][i];
+		}
+		
+		for(int i = 0; i < range; i++){
+			normData[0][i] = rawData[0][i];
+			normData[1][i] = rawData[1][i]/Z;
+		}
+		
+		Err = sumSqErr();
+		e = e_initial = 1;
+		e_initial = sumSqErr();
+		e = sumSqErr();
+		
+		System.out.println("Initial Error is..." + e);
 
-		while(T > 0.0001){// && e > emax){
-//			System.out.println("Count = " + cnt);
+		while(T > 0.0001){// && e > 9e-4){
+			System.out.println("Count = " + cnt);
 //			b = r.nextInt(6);
 		for(b = 0; b < 6; b++){
+			System.out.println("Top of loop Error    = " + e);
+			System.out.println("");
 			variable = parameters.get(b);
 			temp = parameters.get(b);
 			
@@ -83,54 +112,55 @@ public class SimulateAnnealing{
 			if(up > down){
 				Err = down;
 				parameters.set(b, variable + variable * 0.5);
-//				System.out.println("down, Error = " + down);
 			}else{
 				Err = up;
 				parameters.set(b, variable + variable * 0.5);
-//				System.out.println("up, Error = " + up);
 			}
+
+			prob = Math.exp(-(Z*Err/(2*T)));
 			
 			if(Err < e){
 				e = Err;
-//				System.out.println("Error = " + e);
-//				System.out.println("");
-			}else if(Math.exp(-(Err/(k*T))) > r.nextDouble()){
-//				System.out.println("Probability = " + (Math.exp(-(Err/(k*T)))));	
-//				System.out.println("Error = " + Err);
-//				System.out.println("");
-				e = Err;							
-			}
-			T = T-T/2;
+				System.out.println("Bottom of loop Error = " + e);
+				System.out.println("");
+			}else if(false){//prob > r.nextDouble()){
+				e = Err;
+				System.out.println("Probability          = " + prob);	
+				System.out.println("Bottom of loop Error = " + e);
+				System.out.println("");
+			}			
+			T = T - T/2;
 		}
-		cnt = cnt+1;
+			cnt = cnt+1;
 		}	
 		
-		System.out.println("P(x) = " + parameters.get(3) + " * p(V2 = " + parameters.get(0) + ") + " + parameters.get(4) + " * p(V1 = " + parameters.get(1) + ") + " + parameters.get(5) + "p * (V3 = " + parameters.get(2) + ")");
-//		System.out.println("V1 = " + parameters.get(0));
+		myLine = new LineGraph("Test", "Velocity", "Probability");
+		myLine.addSeries("Simulated Data", P_X);
+		myLine.addSeries("Expected", p_x);
+		myLine.addSeries("Normalized Data", normData);
+		myLine.plotIT();
+//		System.out.println("P(x) = " + parameters.get(3) + " * p(V2 = " + parameters.get(0) + ") + " + parameters.get(4) + " * p(V1 = " + parameters.get(1) + ") + " + parameters.get(5) + "p * (V3 = " + parameters.get(2) + ")");
 		System.out.println("V2 = " + parameters.get(1));
-//		System.out.println("V3 = " + parameters.get(2));
-//		System.out.println("A = " + parameters.get(3));
 		System.out.println("B = " + parameters.get(4));
-//		System.out.println("C = " + parameters.get(5));
 		
 	}
 	
-	private static double sumSqErr(){//SimulationData Sim, double[][] P_X, double[][] rawData){
+	private static double sumSqErr(){
 		double sumErr = 0;
-		int range = Sim.size();
-		rawData = DataAnalysis.binnedData(Sim.toArray(), range);
+		int i_max = Sim.size();
 		
-		for(int i = 0; i < range; i++){
-			sumErr = sumErr + DataAnalysis.square(P_X[1][i] - rawData[1][i]/1000);
+		for(int i = 0; i < i_max; i++){
+			sumErr = sumErr + DataAnalysis.square(P_X[1][i] - normData[1][i]);
 		}
-		return Math.abs(sumErr);
+		return sumErr;
 	}
 
 	private static double[][] expCurve(ArrayList<Double> parameters){
 		int range = Sim.size();		
+		double [][]temp = new double[2][range];
 		double i_min = DataAnalysis.min(Sim.toArray());
 		double i_max = DataAnalysis.max(Sim.toArray());
-		double step = (i_max-i_min)/range, A, B, C, V1, V2, V3, p1, p2, p3, v;
+		double step = (i_max-i_min)/range, A, B, C, V1, V2, V3, p1, p2, p3, v, z = 0;
 		
 		V1 = parameters.get(0);
 		V2 = parameters.get(1);
@@ -139,15 +169,23 @@ public class SimulateAnnealing{
 		B = parameters.get(4);
 		C = parameters.get(5);
 		
-		for(int i = 0; i < Sim.size(); i++){
+		for(int i = 0; i < range; i++){
 			v = i_min + i*step;
 			p1 = A/(Math.sqrt(Math.PI)*V1)*Math.exp(-((v*v)/(V1*V1)));
 			p2 = B/(Math.sqrt(Math.PI)*V1)*Math.exp(-((v*v)/(V2*V2)));
 			p3 = C/(Math.sqrt(Math.PI)*V1)*Math.exp(-((v*v)/(V3*V3)));
 			
-			P_X[0][i] = v;
-			P_X[1][i] = p1 + p2 - p3;	
+			temp[0][i] = v;
+			temp[1][i] = (p1 + p2 - p3);
+			
+			z = z + temp[1][i];
 		}
+		
+		for(int i = 0; i < range; i++){
+			P_X[0][i] = temp[0][i];
+			P_X[1][i] = temp[1][i]/z;
+		}
+		
 		return P_X;
 	}
 	
