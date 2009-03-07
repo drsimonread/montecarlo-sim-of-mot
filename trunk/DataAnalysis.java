@@ -2,7 +2,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
-import orbital.algorithm.template.SimulatedAnnealing;
 public class DataAnalysis {
 	
 	static final double Lambda_not = 780.24 * Math.pow(10, -9);
@@ -13,11 +12,10 @@ public class DataAnalysis {
 		Configurations data;	
 		SimulationData Sim;
 		ObjectInputStream file;
+//		LineGraph myLine;
 //		tempVSdetuning TvsD  = new tempVSdetuning();
 //		double[][]temperatureVSDetuning = new double [2][10];
-		SimulateAnnealing SA;
-		SimulatedAnnealing sa;
-		
+		SimulateAnnealing SA;		
 			
 		try{
 			file = new ObjectInputStream(new FileInputStream("simulation_data.dat"));
@@ -29,12 +27,14 @@ public class DataAnalysis {
 				SA = new SimulateAnnealing(Sim);	
 				double [][]ann = new double[2][SA.size()];
 				ann = SA.to2DArray();
-				plots.myLine(ann, "Plot of Fitting Equation", "Velocity", "Probability");
+//				myLine = new LineGraph("Plot of Fitting Equation", "Velocity", "Probability");
+//				myLine.addSeries("Fitted Line", ann);
 				
-//				a = data.size();
+				a = data.size();
 			}
 //			temperatureVSDetuning = TvsD.toArray();
-//			plots.myLine(temperatureVSDetuning, "Temperature VS. Detuning", "Detuning", "Temperature");
+//			myLine = new LineGraph("Temperature VS. Detuning", "Detuning", "Temperature");
+//			myLine.addSeries("Temperature VS. Detuning", temperatureVSDetuning);
 			
 			System.out.println("DONE!");
 		}catch(IOException caught){
@@ -43,8 +43,6 @@ public class DataAnalysis {
 			System.err.println(caught);
 		}
 	}
-	
-
 	
 	public static double max(double[] doubles){
 		double max;
