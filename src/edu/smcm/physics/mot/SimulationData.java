@@ -6,11 +6,13 @@ import java.util.Iterator;
 public class SimulationData implements Serializable, Iterable<Double>{
 	private static final long serialVersionUID = 1L;
 	private double frequency;
-	private ArrayList<Double> velocities;
+//	private Temperature temp;
+	private ArrayList<Double> velocities;//Collection<Double> velocities;
 	
-	public SimulationData(Double detuning){
+	public SimulationData(Double detuning){//, Temperature temperature){
 		this.frequency = detuning;
-		this.velocities = new ArrayList<Double>();
+//		this.temp = temperature;
+		this.velocities = new ArrayList<Double>();  //Vector<Double>();
 	}
 	
 	public void addVelocity(double velocity){
@@ -30,6 +32,11 @@ public class SimulationData implements Serializable, Iterable<Double>{
 	public double frequency(){
 		return this.frequency;
 	}
+	
+//	public double temperature(){
+//		double T = temp.getTemperature();
+//		return T;
+//	}
 	
 	public int size(){
 		return velocities.size();
