@@ -1,27 +1,9 @@
+package edu.smcm.mathcs.util;
+import edu.smcm.physics.mot.SimulationData;
 
 public class KDE {
-	private static SimulationData data;
-	
-	public static double[][] SmoothIt (SimulationData data_){
-		double t = 0;
-		data = data_;
-		int iMax = data.size();
-//		System.out.println("Size = " + iMax);
-		double[][]KDE = new double[2][iMax];
-		double min = DataAnalysis.min(data.toArray());
-		double max = DataAnalysis.max(data.toArray());
-		double step = (max-min)/iMax;
-//		System.out.println("Step = " + step);
-		for(int i = 0; i < iMax; i++){
-			t = min + i * step;
-//			System.out.println("t = " + t);
-			KDE[0][i] = t;
-			KDE[1][i] = Math.abs(f_hat(data, t));
-		}
-		return KDE;
-	}
 
-	private static double f_hat(SimulationData data, Double t){
+	public static double f_hat(SimulationData data, Double t){
 		int i_max = data.size();
 		double d_k = D_kofT(data, k(data), t);
 		double kernal = 0;
@@ -32,12 +14,12 @@ public class KDE {
 		return 1/(i_max*d_k)*kernal;
 	}
 	
-	private static int k (SimulationData data){
+	public static int k (SimulationData data){
 		int kth = (int)Math.sqrt(data.size());
 		return kth;
 	}
 	
-	private static double D_kofT (SimulationData data, int k, Double t){
+	public static double D_kofT (SimulationData data, int k, Double t){
 		data.sort();
 		int i = rank_of_nearest(t, data);
 		int next_nearest_higher_rank = i+1;
@@ -70,7 +52,7 @@ public class KDE {
 		return t - data.getValue(next_nearest_rank);
 	}
 	
-	private static int rank_of_nearest (Double t, SimulationData data){
+	public static int rank_of_nearest (Double t, SimulationData data){
 		int i = data.binarySearch(t);
 		int previous;
 		if (i == 0){
@@ -86,7 +68,7 @@ public class KDE {
 		return i;
 	}
 	
-	private static double square(double arg){
+	public static double square(double arg){
 		return arg*arg;
 	}
 }

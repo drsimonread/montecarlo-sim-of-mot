@@ -2,7 +2,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.Math;
-import java.util.Calendar;
 
 public class Equations{
 	static final double Lambda_not = 780.24 * Math.pow(10, -9);
@@ -27,17 +26,14 @@ public class Equations{
 		long start, end;
 		double time;
 		start = System.nanoTime();
-		Calendar rightNow = Calendar.getInstance();
-		long timeStamp = rightNow.getTimeInMillis();
-		double step = 0.5e6;
+		double step = 1.5e6;
 		configs = new Configurations();
 		
-		
-		for(int s = 0; s < 15; s++ ){
+		for(int s = 0; s < 10; s++ ){
 			System.out.println("Starting configuration " + s + ".");
 			delta = -(0.5e6 + (s * step));
 			data = new SimulationData(delta);//, initial_temp);
-			for(int i = 0; i < 150000; i++){
+			for(int i = 0; i < 10000; i++){
 				initialVelocity = rand.nextGaussian(0, V_calc(initial_temp.getTemperature()));
 				for(int j = 0; j < 30000; j++){
 					initialVelocity = senario(initialVelocity);
@@ -57,7 +53,7 @@ public class Equations{
 		}
 		
 		try{
-			file = new ObjectOutputStream(new FileOutputStream("simulation_data " + timeStamp + ".dat"));
+			file = new ObjectOutputStream(new FileOutputStream("simulation_data.dat"));
 			file.writeObject(configs);
 			file.close();
 		}catch(IOException caught){
