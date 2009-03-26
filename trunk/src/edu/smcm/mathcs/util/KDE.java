@@ -1,11 +1,30 @@
 package edu.smcm.mathcs.util;
+import edu.smcm.physics.mot.DataAnalysis;
 import edu.smcm.physics.mot.SimulationData;
 
-public class KDE {
 
-	public static double f_hat(SimulationData data, Double t){
+public class KDE {
+	private static SimulationData data;
+	
+	public static double[][] SmoothIt (SimulationData data_){
+		double t = 0;
+		data = data_;
+		int iMax = data.size();
+		double[][]KDE = new double[2][iMax];
+		double min = DataAnalysis.min(data.toArray());
+		double max = DataAnalysis.max(data.toArray());
+		double step = (max-min)/iMax;
+		for(int i = 0; i < iMax; i++){
+			t = min + i * step;
+			KDE[0][i] = t;
+			KDE[1][i] = Math.abs(f_hat(t));
+		}
+		return KDE;
+	}
+
+	private static double f_hat(double t){
 		int i_max = data.size();
-		double d_k = D_kofT(data, k(data), t);
+		double d_k = D_kofT(k(), t);
 		double kernal = 0;
 		
 		for (int i = 0; i < i_max; i++){
@@ -14,14 +33,14 @@ public class KDE {
 		return 1/(i_max*d_k)*kernal;
 	}
 	
-	public static int k (SimulationData data){
+	private static int k (){
 		int kth = (int)Math.sqrt(data.size());
 		return kth;
 	}
 	
-	public static double D_kofT (SimulationData data, int k, Double t){
+	private static double D_kofT (int k, double t){
 		data.sort();
-		int i = rank_of_nearest(t, data);
+		int i = rank_of_nearest(t);
 		int next_nearest_higher_rank = i+1;
 		int next_nearest_lower_rank = i-1;
 		int next_nearest_rank = 0;
@@ -52,7 +71,7 @@ public class KDE {
 		return t - data.getValue(next_nearest_rank);
 	}
 	
-	public static int rank_of_nearest (Double t, SimulationData data){
+	private static int rank_of_nearest (double t){
 		int i = data.binarySearch(t);
 		int previous;
 		if (i == 0){
@@ -63,12 +82,11 @@ public class KDE {
 		
 		if (Math.abs(t - data.getValue(i)) > (Math.abs(t - data.getValue(previous)))){
 			i = i - 1;
-//			System.out.println("Element is..." + data.getValue(i));
 		}
 		return i;
 	}
 	
-	public static double square(double arg){
+	private static double square(double arg){
 		return arg*arg;
 	}
 }

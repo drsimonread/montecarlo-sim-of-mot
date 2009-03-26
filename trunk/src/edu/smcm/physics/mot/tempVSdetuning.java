@@ -1,3 +1,5 @@
+package edu.smcm.physics.mot;
+
 public class tempVSdetuning {
 	
 	private Temperature temp;
