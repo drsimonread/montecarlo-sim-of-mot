@@ -1,3 +1,6 @@
+package edu.smcm.physics.mot;
+import edu.smcm.physics.mot.SimulationData;
+import edu.smcm.physics.mot.Temperature;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;

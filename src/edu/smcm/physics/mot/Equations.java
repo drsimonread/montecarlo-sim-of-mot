@@ -1,7 +1,13 @@
+package edu.smcm.physics.mot;
+import edu.smcm.physics.mot.MyRandom;
+import edu.smcm.physics.mot.SimulationData;
+import edu.smcm.physics.mot.Temperature;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.Math;
+import java.util.Calendar;
 
 public class Equations{
 	static final double Lambda_not = 780.24 * Math.pow(10, -9);
@@ -26,26 +32,32 @@ public class Equations{
 		long start, end;
 		double time;
 		start = System.nanoTime();
-		double step = 1.5e6;
+		Calendar rightNow = Calendar.getInstance();
+		long timeStamp = rightNow.getTimeInMillis();
+		double step = 0.5e6;
 		configs = new Configurations();
 		
-		for(int s = 0; s < 10; s++ ){
-			System.out.println("Starting configuration " + s + ".");
-			delta = -(0.5e6 + (s * step));
-			data = new SimulationData(delta);//, initial_temp);
-			for(int i = 0; i < 10000; i++){
+		
+		for(int s = 0; s < 4; s++ ){
+			int pt = (int) (1 * Math.pow(10, 2 + s));
+//			System.out.println("Starting configuration " + s + ".");
+			delta = -3e6;//(0.5e6 + (s * step));
+			data = new SimulationData(delta);
+			for(int i = 0; i < pt; i++){
 				initialVelocity = rand.nextGaussian(0, V_calc(initial_temp.getTemperature()));
 				for(int j = 0; j < 30000; j++){
 					initialVelocity = senario(initialVelocity);
 				}
 				data.addVelocity(initialVelocity);
 			}
-			configs.addConfiguration(data);//, initial_temp);
+			configs.addConfiguration(data);
+			
+			end = System.nanoTime();
+			time =  ((end - start)/ 1e9)/60;
+			System.out.println("Run Time:  " + time + ".  Number of atoms " + pt);			
 		}
 		
-		end = System.nanoTime();
-		time =  ((end - start)/ 1e9)/60;
-		System.out.println("Run Time:  " + time);
+
 
 		for (int i = 0; i < configs.size(); i++) {
 			data = configs.get(i);
@@ -53,7 +65,7 @@ public class Equations{
 		}
 		
 		try{
-			file = new ObjectOutputStream(new FileOutputStream("simulation_data.dat"));
+			file = new ObjectOutputStream(new FileOutputStream("simulation_data " + timeStamp + ".dat"));
 			file.writeObject(configs);
 			file.close();
 		}catch(IOException caught){

@@ -1,3 +1,4 @@
+package edu.smcm.physics.mot;
 import java.util.ArrayList;
 
 public class Detuning {
