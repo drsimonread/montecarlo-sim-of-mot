@@ -91,8 +91,6 @@ public class SimulateAnnealing{
 		System.out.println("Initial Error is..." + e);
 
 		while(cnt < 1000){
-//			System.out.println("Count = " + cnt);
-//			System.out.println("Top of loop Error    = " + e);
 			System.out.println("");
 			
 			int i = r.nextInt(6);
@@ -108,9 +106,8 @@ public class SimulateAnnealing{
 			down = sumSqErr();
 
 			if(down >= e && up >= e){
-				System.out.println("Neither up nor down.");
-				delta = delta/2;	
-				variables.set(i, delta * var);
+				System.out.println("Neither up nor down.");	
+				variables.set(i, var/2);
 			}else if(up > down){
 				Err = down;
 				parameters.set(i, variable - var);
@@ -133,7 +130,7 @@ public class SimulateAnnealing{
 //		myLine.addSeries("Expected", p_x);
 		myLine.addSeries("Normalized Data", normData);
 		myLine.plotIT();
-//		System.out.println("P(x) = " + parameters.get(3) + " * p(V2 = " + parameters.get(0) + ") + " + parameters.get(4) + " * p(V1 = " + parameters.get(1) + ") + " + parameters.get(5) + "p * (V3 = " + parameters.get(2) + ")");
+		System.out.println("P(x) = " + parameters.get(3) + " * p(V2 = " + parameters.get(0) + ") + " + parameters.get(4) + " * p(V1 = " + parameters.get(1) + ") + " + parameters.get(5) + "p * (V3 = " + parameters.get(2) + ")");
 		System.out.println("A = " + parameters.get(3));
 		System.out.println("B = " + parameters.get(4));
 		
@@ -151,13 +148,13 @@ public class SimulateAnnealing{
 	private static double[][] normalize(double[][] arr){
 		int range = Sim.size();
 		
-		for(int i  = 0; i < range; i++){
-			Z = Z + arr[1][i];
-		}
+//		for(int i  = 0; i < range; i++){
+//			Z = Z + arr[1][i];
+//		}
 		
 		for(int i = 0; i < range; i++){
 			normData[0][i] = arr[0][i];
-			normData[1][i] = arr[1][i]/Z;
+			normData[1][i] = arr[1][i];
 		}
 		return normData;
 	}
@@ -167,7 +164,7 @@ public class SimulateAnnealing{
 		int i_max = Sim.size();
 		
 		for(int i = 0; i < i_max; i++){
-			sumErr = sumErr + DataAnalysis.square(P_X[1][i] - normData[1][i]);
+			sumErr = sumErr + DataAnalysis.square((P_X[1][i]*10000) - normData[1][i]);
 		}
 		return sumErr;
 	}

@@ -1,10 +1,13 @@
-package edu.smcm.physics.mot;
+
 import edu.smcm.physics.mot.SimulationData;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class Configurations implements Serializable, Iterable<SimulationData>{
+public class Configurations 
+	extends edu.smcm.physics.mot.Configurations
+	implements Serializable, Iterable<SimulationData>
+{
 	private static final long serialVersionUID = 1L;
 	private ArrayList<SimulationData> simulations;
 	
