@@ -38,8 +38,8 @@ public class Equations{
 		configs = new Configurations();
 		
 		
-		for(int s = 0; s < 4; s++ ){
-			int pt = (int) (1 * Math.pow(10, 2 + s));
+//		for(int s = 0; s < 4; s++ ){
+			int pt = 10000;//(int) (1 * Math.pow(10, 2 + s));
 //			System.out.println("Starting configuration " + s + ".");
 			delta = -3e6;//(0.5e6 + (s * step));
 			data = new SimulationData(delta);
@@ -55,7 +55,7 @@ public class Equations{
 			end = System.nanoTime();
 			time =  ((end - start)/ 1e9)/60;
 			System.out.println("Run Time:  " + time + ".  Number of atoms " + pt);			
-		}
+//		}
 		
 
 

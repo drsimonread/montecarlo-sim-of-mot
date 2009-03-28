@@ -1,6 +1,4 @@
 package edu.smcm.physics.mot;
-import edu.smcm.physics.mot.SimulateAnnealing;
-import edu.smcm.physics.mot.SimulationData;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -12,26 +10,28 @@ public class DataAnalysis {
 	static final double Gamma = 6e6;//2 * Math.PI * 3E6;// 1 / tau;
 	
 	public static void main(String[] args){
-		Configurations data;	
+		Configurations data;
 		SimulationData Sim;
 		ObjectInputStream file;
-//		LineGraph myLine;
+		LineGraph myLine;
 //		tempVSdetuning TvsD  = new tempVSdetuning();
 //		double[][]temperatureVSDetuning = new double [2][10];
 		SimulateAnnealing SA;		
 			
 		try{
-			file = new ObjectInputStream(new FileInputStream("simulation_data 1236362800643.dat"));
+			data = new Configurations();
+			file = new ObjectInputStream(new FileInputStream("simulation_data 1238181050427.dat"));
 			data = (Configurations) file.readObject();
 			file.close();
 			
 			for(int a = 0; a < data.size(); a++){
 				Sim = data.get(a);
+				System.out.println("simulation size is..." + Sim.size());
 				SA = new SimulateAnnealing(Sim);	
 				double [][]ann = new double[2][SA.size()];
 				ann = SA.to2DArray();
-//				myLine = new LineGraph("Plot of Fitting Equation", "Velocity", "Probability");
-//				myLine.addSeries("Fitted Line", ann);
+				myLine = new LineGraph("Plot of Fitting Equation", "Velocity", "Probability");
+				myLine.addSeries("Fitted Line", ann);
 				
 				a = data.size();
 			}
