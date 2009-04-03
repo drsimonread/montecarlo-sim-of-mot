@@ -20,7 +20,7 @@ public class DataAnalysis {
 			
 		try{
 			data = new Configurations();
-			file = new ObjectInputStream(new FileInputStream("simulation_data 1238181050427.dat"));
+			file = new ObjectInputStream(new FileInputStream("simulation_data 1238709216932.dat"));
 			data = (Configurations) file.readObject();
 			file.close();
 			
@@ -32,7 +32,8 @@ public class DataAnalysis {
 				ann = SA.to2DArray();
 				myLine = new LineGraph("Plot of Fitting Equation", "Velocity", "Probability");
 				myLine.addSeries("Fitted Line", ann);
-				
+				myLine.addSeries("Data", binnedData(Sim.toArray(), Sim.size()));
+				myLine.plotIT();
 				a = data.size();
 			}
 //			temperatureVSDetuning = TvsD.toArray();

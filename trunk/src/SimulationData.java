@@ -9,10 +9,11 @@ extends edu.smcm.physics.mot.SimulationData
 implements Serializable, Iterable<Double>{
 	private static final long serialVersionUID = 1L;
 	private double frequency;
+	private double temperature;
 	private ArrayList<Double> velocities;
 	
-	public SimulationData(Double detuning){
-		super(detuning);
+	public SimulationData(Double detuning, Double initial_temp){
+		super(detuning, initial_temp);
 	}
 	
 	public void addVelocity(double velocity){

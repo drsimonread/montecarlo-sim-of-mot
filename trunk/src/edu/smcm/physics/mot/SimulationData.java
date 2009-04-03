@@ -7,10 +7,12 @@ import java.util.Iterator;
 public class SimulationData implements Serializable, Iterable<Double>{
 	private static final long serialVersionUID = 1L;
 	private double frequency;
+	private double temperature;
 	private ArrayList<Double> velocities;
 	
-	public SimulationData(Double detuning){
+	public SimulationData(Double detuning, Double initial_temp){
 		this.frequency = detuning;
+		this.temperature = initial_temp;
 		this.velocities = new ArrayList<Double>();
 	}
 	
@@ -46,6 +48,24 @@ public class SimulationData implements Serializable, Iterable<Double>{
 	
 	public void sort(){
 		Collections.sort(velocities);
+	}
+	
+	public double getVelocity(){
+		return Equations.V_calc(temperature);
+	}
+	
+	public double getAmplitude(){
+		double amp;
+		int size = velocities.size();
+		double[] arr = new double[size];
+		
+		for (int i = 0; i < size; i++){
+			arr[i] = velocities.get(i);
+		}
+		
+		amp = DataAnalysis.max(DataAnalysis.binnedData(arr, size)[1]);
+		
+		return amp;
 	}
 	
 	public int binarySearch(double t){
