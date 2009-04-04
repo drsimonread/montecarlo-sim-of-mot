@@ -17,6 +17,7 @@ public class DataAnalysis {
 //		tempVSdetuning TvsD  = new tempVSdetuning();
 //		double[][]temperatureVSDetuning = new double [2][10];
 		SimulateAnnealing SA;		
+		HillClimbing HC;
 			
 		try{
 			data = new Configurations();
@@ -27,11 +28,18 @@ public class DataAnalysis {
 			for(int a = 0; a < data.size(); a++){
 				Sim = data.get(a);
 				System.out.println("simulation size is..." + Sim.size());
+				
 				SA = new SimulateAnnealing(Sim);	
 				double [][]ann = new double[2][SA.size()];
 				ann = SA.to2DArray();
+				
+				HC = new HillClimbing(Sim);
+				double[][]hill = new double[2][HC.size()];
+				hill = HC.to2DArray();
+				
 				myLine = new LineGraph("Plot of Fitting Equation", "Velocity", "Probability");
 				myLine.addSeries("Fitted Line", ann);
+				myLine.addSeries("Hill Climbing", hill);
 				myLine.addSeries("Data", binnedData(Sim.toArray(), Sim.size()));
 				myLine.plotIT();
 				a = data.size();

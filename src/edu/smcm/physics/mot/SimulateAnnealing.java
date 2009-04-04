@@ -13,7 +13,7 @@ public class SimulateAnnealing{
 	static final double Gamma = 6e6;//2 * Math.PI * 3E6;// 1 / tau;
 	private static double[] fit;
 	private static SimulationData data;
-//	private static int size;
+	private static int range;
 	private static Random r = new Random();
 	
 	public SimulateAnnealing(SimulationData Sim){
@@ -22,23 +22,22 @@ public class SimulateAnnealing{
 	
 	private ArrayList<Double> SA(SimulationData mySim){
 		data = mySim;
-		int max_iteration = 250;
+		range = data.size();
+		int max_iteration = 150;
 		int iteration = 1;
-		double target_error = 1;
 		int cnt = 0;
 		ArrayList<Double> values = new ArrayList<Double>();
+		double[][] mydata = DataAnalysis.binnedData(data.toArray(), range);
 		values = generateParameters();
-		double[][] mydata = DataAnalysis.binnedData(data.toArray(), 100);
 		double error = computeError(values, mydata);
 		ArrayList<Double> best_values = (ArrayList<Double>) values.clone();
 		double best_error = error;
 		double temp_zero = 1000;
-		double temp = 0;
+		double temp = temp_zero;
 		
-		while(iteration < max_iteration && error > target_error){
+		while(temp >=0 && iteration < max_iteration){
 			ArrayList<Double> next_values = generateParameters();
 			double next_error = computeError(next_values, mydata);
-			
 			if(next_error < best_error){
 				best_values = next_values;
 				best_error = next_error;
@@ -47,31 +46,30 @@ public class SimulateAnnealing{
 			
 			if(exciteProbability(error, next_error, temp) > r.nextDouble()){
 				cnt = cnt + 1;
-//				System.out.println("Accepted new state..." + cnt);
 				values = next_values;
 				error = next_error;
 			}
 			iteration = iteration + 1;
 			System.out.println("Count = " + iteration + ".  Error = " + error + ". Temperature = " + temp);
 		}
-		System.out.println("V1 = " + values.get(0));
-		System.out.println("V2 = " + values.get(1));
-		System.out.println("V3 = " + values.get(2));
-		System.out.println("A = " + values.get(3));
-		System.out.println("B = " + values.get(4));
-		System.out.println("C = " + values.get(5));
-		fit  = expCurve(values);
+		System.out.println("V1 = " + best_values.get(0));
+		System.out.println("V2 = " + best_values.get(1));
+		System.out.println("V3 = " + best_values.get(2));
+		System.out.println("A = " + best_values.get(3));
+		System.out.println("B = " + best_values.get(4));
+		System.out.println("C = " + best_values.get(5));
+		fit  = expCurve(best_values);
 		return best_values;
 	}
 	
 	private static ArrayList<Double> generateParameters(){
 		ArrayList<Double> somevalue = new ArrayList<Double>();
 		double V1 = data.getVelocity();
-		double V2 = V1 * r.nextDouble();
-		double V3 = V2 * r.nextDouble();
+		double V2 = (V1/10) * r.nextDouble();
+		double V3 = (V2/2) * r.nextDouble();
 		double A = data.getAmplitude();
 		double B = A * r.nextDouble();
-		double C = B * V2 / V3;
+		double C = 10 * B * V2 / V3;
 		
 		somevalue.add(V1);
 		somevalue.add(V2);
@@ -90,9 +88,8 @@ public class SimulateAnnealing{
 			prob = 1.0;
 		}else{
 			prob = Math.exp((error - next_error)/temp);
-			System.out.println("new state Probability = " + prob + ".  e^(" + (error - next_error)/temp + ")");
+//			System.out.println("new state Probability = " + prob + ".  e^(" + (error - next_error)/temp + ")");
 		}
-		
 		return prob;
 	}
 	
@@ -100,6 +97,7 @@ public class SimulateAnnealing{
 		double sumErr = 0;
 		int i_max = myData.length;
 		double[] the_prediction = expCurve(values);
+		
 		for(int i = 0; i < i_max; i++){
 			sumErr = sumErr + Math.sqrt(DataAnalysis.square(the_prediction[i] - myData[1][i]));
 			} 
@@ -107,7 +105,6 @@ public class SimulateAnnealing{
 	}
 
 	private static double[] expCurve(ArrayList<Double> values){
-		int range = data.size();
 		double[] P_X = new double[range];
 		double i_min = DataAnalysis.min(data.toArray());
 		double i_max = DataAnalysis.max(data.toArray());
@@ -132,13 +129,12 @@ public class SimulateAnnealing{
 	}
 	
 	public int size(){
-		return data.size();
+		return range;
 	}
 	
 	public double[][] to2DArray(){
 		double i_min = DataAnalysis.min(data.toArray());
 		double i_max = DataAnalysis.max(data.toArray());
-		int range = data.size();
 		double step = (i_max-i_min)/range;
 		double[][]twoD = new double[2][range];
 		
