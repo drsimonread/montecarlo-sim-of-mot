@@ -1,7 +1,6 @@
 package edu.smcm.physics.mot;
 import java.util.ArrayList;
 import java.util.Random;
-import edu.smcm.mathcs.util.KDE;
 
 /**
  *
@@ -16,33 +15,39 @@ public class SimulateAnnealing{
 	private static int range;
 	private static Random r = new Random();
 	
-	public SimulateAnnealing(SimulationData Sim){
-			SA(Sim);
+	public SimulateAnnealing(SimulationData sim){
+			SA(sim);
 	}
 	
 	private ArrayList<Double> SA(SimulationData mySim){
 		data = mySim;
 		range = data.size();
-		int max_iteration = 150;
-		int iteration = 1;
-		int cnt = 0;
+		int max_iteration = 150, iteration = 1, cnt = 0;
 		ArrayList<Double> values = new ArrayList<Double>();
-		double[][] mydata = DataAnalysis.binnedData(data.toArray(), range);
 		values = generateParameters();
-		double error = computeError(values, mydata);
 		ArrayList<Double> best_values = (ArrayList<Double>) values.clone();
+		
+//		System.out.println("Velocity  = " + data.getVelocity());
+//		System.out.println("Amplitude = " + data.getAmplitude());
+		
+		double[][]normalized_data = normalize(DataAnalysis.binnedData(data.toArray(), data.size()));
+		
+		double error = computeError(values, normalized_data);
+		System.out.println("Initial Error = " + error);
 		double best_error = error;
 		double temp_zero = 1000;
 		double temp = temp_zero;
 		
-		while(temp >=0 && iteration < max_iteration){
+		while(temp >=10 ){//&& iteration < max_iteration){
 			ArrayList<Double> next_values = generateParameters();
-			double next_error = computeError(next_values, mydata);
+			double next_error = computeError(next_values, normalized_data);
+			
 			if(next_error < best_error){
 				best_values = next_values;
 				best_error = next_error;
 			}
 			temp = temp_zero/iteration;
+//			System.out.println("Next error = " + next_error + ".  Error = " + error);
 			
 			if(exciteProbability(error, next_error, temp) > r.nextDouble()){
 				cnt = cnt + 1;
@@ -50,7 +55,7 @@ public class SimulateAnnealing{
 				error = next_error;
 			}
 			iteration = iteration + 1;
-			System.out.println("Count = " + iteration + ".  Error = " + error + ". Temperature = " + temp);
+//			System.out.println("Count = " + iteration + ". Temperature = " + temp);
 		}
 		System.out.println("V1 = " + best_values.get(0));
 		System.out.println("V2 = " + best_values.get(1));
@@ -58,18 +63,19 @@ public class SimulateAnnealing{
 		System.out.println("A = " + best_values.get(3));
 		System.out.println("B = " + best_values.get(4));
 		System.out.println("C = " + best_values.get(5));
+		System.out.println("Best Error    = " + best_error);
 		fit  = expCurve(best_values);
 		return best_values;
 	}
 	
 	private static ArrayList<Double> generateParameters(){
 		ArrayList<Double> somevalue = new ArrayList<Double>();
-		double V1 = data.getVelocity();
-		double V2 = (V1/10) * r.nextDouble();
-		double V3 = (V2/2) * r.nextDouble();
-		double A = data.getAmplitude();
-		double B = A * r.nextDouble();
-		double C = 10 * B * V2 / V3;
+		double V1 = data.getVelocity();//initial
+		double A = data.getAmplitude()/data.size();//initial
+		double V2 = (2*V1/10);// * r.nextDouble();//missing
+		double B = A;// * r.nextDouble();//missing
+		double V3 = (V2/10) * r.nextDouble();//spike
+		double C = 0.76 * B * V2 / V3;//spike
 		
 		somevalue.add(V1);
 		somevalue.add(V2);
@@ -79,6 +85,21 @@ public class SimulateAnnealing{
 		somevalue.add(C);
 		
 		return somevalue;
+	}
+	
+	private double[][] normalize(double [][] binned_data){ 
+		double[][] normalized_data = new double [2][data.size()];
+		double Z = 0;
+		
+		for(int i = 0; i < data.size(); i++){
+			Z = Z + binned_data[1][i];
+		}
+		
+		for (int i = 0; i < data.size(); i++){
+			normalized_data[0][i] = binned_data[0][i];
+			normalized_data[1][i] = binned_data[1][i]/Z;
+		}
+		return normalized_data;
 	}
 	
 	private double exciteProbability(double error, double next_error, double temp){
@@ -99,7 +120,7 @@ public class SimulateAnnealing{
 		double[] the_prediction = expCurve(values);
 		
 		for(int i = 0; i < i_max; i++){
-			sumErr = sumErr + Math.sqrt(DataAnalysis.square(the_prediction[i] - myData[1][i]));
+			sumErr = sumErr + Math.sqrt(DataAnalysis.square((the_prediction[i] - myData[1][i]) * i_max));
 			} 
 		return sumErr;
 	}

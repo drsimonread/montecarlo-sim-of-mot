@@ -14,21 +14,19 @@ public class DataAnalysis {
 		SimulationData Sim;
 		ObjectInputStream file;
 		LineGraph myLine;
-//		tempVSdetuning TvsD  = new tempVSdetuning();
-//		double[][]temperatureVSDetuning = new double [2][10];
 		SimulateAnnealing SA;		
 		HillClimbing HC;
 			
 		try{
 			data = new Configurations();
-			file = new ObjectInputStream(new FileInputStream("simulation_data 1238709216932.dat"));
+			file = new ObjectInputStream(new FileInputStream("simulation_data 1238982642011.dat"));
 			data = (Configurations) file.readObject();
 			file.close();
 			
 			for(int a = 0; a < data.size(); a++){
 				Sim = data.get(a);
 				System.out.println("simulation size is..." + Sim.size());
-				
+
 				SA = new SimulateAnnealing(Sim);	
 				double [][]ann = new double[2][SA.size()];
 				ann = SA.to2DArray();
@@ -40,13 +38,11 @@ public class DataAnalysis {
 				myLine = new LineGraph("Plot of Fitting Equation", "Velocity", "Probability");
 				myLine.addSeries("Fitted Line", ann);
 				myLine.addSeries("Hill Climbing", hill);
-				myLine.addSeries("Data", binnedData(Sim.toArray(), Sim.size()));
+				double[][] norm_data = normalize(binnedData(Sim.toArray(), Sim.size()));
+				myLine.addSeries("Data", norm_data);
 				myLine.plotIT();
 				a = data.size();
 			}
-//			temperatureVSDetuning = TvsD.toArray();
-//			myLine = new LineGraph("Temperature VS. Detuning", "Detuning", "Temperature");
-//			myLine.addSeries("Temperature VS. Detuning", temperatureVSDetuning);
 			
 			System.out.println("DONE!");
 		}catch(IOException caught){
@@ -54,6 +50,21 @@ public class DataAnalysis {
 		}catch(ClassNotFoundException caught){
 			System.err.println(caught);
 		}
+	}
+	
+	public static double[][] normalize(double [][] binned_data){ 
+		double[][] normalized_data = new double [2][binned_data[1].length];
+		double Z = 0;
+		
+		for(int i = 0; i < binned_data[1].length; i++){
+			Z = Z + binned_data[1][i];
+		}
+		
+		for (int i = 0; i < binned_data[1].length; i++){
+			normalized_data[0][i] = binned_data[0][i];
+			normalized_data[1][i] = binned_data[1][i]/Z;
+		}
+		return normalized_data;
 	}
 	
 	public static double max(double[] doubles){
@@ -94,7 +105,6 @@ public class DataAnalysis {
 				indexATmax = i;
 			}
 		}
-//		System.out.println(indexATmax);
 				
 		min = data[1][indexATmax];
 		for (int i = indexATmax; i < 10000; i++){
@@ -160,7 +170,6 @@ public class DataAnalysis {
 		int i_max  = arr.length;
 		for (int k = 0; k < i_max; k++){
 			p = p + arr[0][k];
-//			System.out.println(arr[0][k]);
 			q = q + arr[1][k];
 			r = r + arr[0][k] * arr[1][k];
 			s = s + arr[0][k] * arr[0][k];
