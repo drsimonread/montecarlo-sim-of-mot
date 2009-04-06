@@ -1,7 +1,6 @@
 package edu.smcm.physics.mot;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public class HillClimbing {
 	
@@ -10,36 +9,30 @@ public class HillClimbing {
 	static final double Gamma = 6e6;//2 * Math.PI * 3E6;// 1 / tau;
 	private static double[] P_X;
 	private static SimulationData data;
-	private static double[][] mydata;
 	private static int range;
-	private static Random r = new Random();
 
 	public HillClimbing(SimulationData Sim){
 		data = Sim;
 		range = data.size();
-		int max_iteration = 1000;
-		int iteration = 1;
+		int max_iteration = 1000, iteration = 1;
 		ArrayList<Double> values = new ArrayList<Double>();
-		
-		mydata = DataAnalysis.binnedData(data.toArray(), range);
-		
-		double maxB = DataAnalysis.max(mydata[1]);
-		values = generateParameters(maxB);
-		double error = computeError(values, mydata);
+		double[][]normalized_data = normalize(DataAnalysis.binnedData(data.toArray(), data.size()));
+		values = generateParameters();
+		double error = computeError(values, normalized_data);
 		System.out.println("Initial Error = " + error);
 		double delta = 1/1000;
 		
 		while(iteration != max_iteration){
 
-			for(int i = 2; i < 4; i++){
+			for(int i = 1; i < 4; i++){
 				double thisValue = values.get(i);
 				
 				values.set(i, thisValue + thisValue * delta);
-				double up = computeError(values, mydata);
+				double up = computeError(values, normalized_data);
 				values.set(i, thisValue);
 
 				values.set(i, thisValue - thisValue * delta);
-				double down = computeError(values, mydata);
+				double down = computeError(values, normalized_data);
 				values.set(i, thisValue);
 
 				if (up >= error && down >= error){
@@ -56,19 +49,42 @@ public class HillClimbing {
 			}
 			iteration = iteration + 1;
 //			System.out.println("Count = " + iteration);
-		}		
+		}
+		
+		System.out.println("V1 = " + values.get(0));
+		System.out.println("V2 = " + values.get(2));
+		System.out.println("V3 = " + values.get(3));
+		System.out.println("A = " + values.get(1));
+		System.out.println("B = " + values.get(4));
+		System.out.println("C = " + values.get(5));
+		System.out.println("Final Error =   " + error);
 	}
 	
-	private static ArrayList<Double> generateParameters(double b){
+	private double[][] normalize(double [][] binned_data){ 
+		double[][] normalized_data = new double [2][data.size()];
+		double Z = 0;
+		
+		for(int i = 0; i < data.size(); i++){
+			Z = Z + binned_data[1][i];
+		}
+		
+		for (int i = 0; i < data.size(); i++){
+			normalized_data[0][i] = binned_data[0][i];
+			normalized_data[1][i] = binned_data[1][i]/Z;
+		}
+		return normalized_data;
+	}
+	
+	private static ArrayList<Double> generateParameters(){
 		ArrayList<Double> somevalue = new ArrayList<Double>();
-		double V1 = 13.78;//data.getVelocity();
-		double A = data.getAmplitude();
-		double B = b;
+		double V1 = data.getVelocity();
+		double A = data.getAmplitude()/data.size();
+		double B = A;
 		
-		double V2 = 3;//V1 * r.nextDouble();
-		double V3 = 0.75;//V2 * r.nextDouble();
+		double V2 = 2*V1/10;
+		double V3 = V2/45;// * r.nextDouble();
 		
-		double C = 10*(B * V2 / V3);
+		double C = 0.75 * B * V2 / V3;
 		
 		somevalue.add(V1);
 		somevalue.add(A);
@@ -87,8 +103,8 @@ public class HillClimbing {
 		int i_max = theData.length;
 		double[] the_prediction = expCurve(values);
 		for(int i = 0; i < i_max; i++){
-			sumErr = sumErr + Math.sqrt(DataAnalysis.square(the_prediction[i] - theData[1][i]));
-			} 
+			sumErr = sumErr + Math.sqrt(DataAnalysis.square((the_prediction[i] - theData[1][i])*i_max));
+		} 
 		return sumErr;
 	}
 
