@@ -24,7 +24,7 @@ public class HillClimbing {
 		
 		while(iteration != max_iteration){
 
-			for(int i = 1; i < 4; i++){
+			for(int i = 0; i < 6; i++){
 				double thisValue = values.get(i);
 				
 				values.set(i, thisValue + thisValue * delta);
@@ -79,11 +79,11 @@ public class HillClimbing {
 		ArrayList<Double> somevalue = new ArrayList<Double>();
 		double V1 = data.getVelocity();
 		double A = data.getAmplitude()/data.size();
-		double B = A;
 		
 		double V2 = 2*V1/10;
-		double V3 = V2/45;// * r.nextDouble();
+		double B = A;
 		
+		double V3 = V2/45;// * r.nextDouble();
 		double C = 0.75 * B * V2 / V3;
 		
 		somevalue.add(V1);
@@ -91,8 +91,8 @@ public class HillClimbing {
 		
 		somevalue.add(V2);
 		somevalue.add(V3);
-		somevalue.add(B);
 		
+		somevalue.add(B);
 		somevalue.add(C);
 		
 		return somevalue;
