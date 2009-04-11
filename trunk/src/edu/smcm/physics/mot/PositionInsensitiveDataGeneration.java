@@ -10,7 +10,7 @@ import java.lang.Math;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class Equations{
+public class PositionInsensitiveDataGeneration{//Equations{
 	static final double Lambda_not = 780.24 * Math.pow(10, -9);
 	static final double k = 2 * Math.PI / Lambda_not;
 	static final double h_bar = 6.6260657E-34/ (2 * Math.PI);
@@ -41,7 +41,7 @@ public class Equations{
 		
 		
 //		for(int s = 0; s < 4; s++ ){
-			int pt = 2400000;//(int) (1 * Math.pow(10, 2 + s));
+			int pt = 100000;//(int) (1 * Math.pow(10, 2 + s));
 //			System.out.println("Starting configuration " + s + ".");
 			delta = -3e6;//(0.5e6 + (s * step));
 			data = new SimulationData(delta, initial_temp.getTemperature());

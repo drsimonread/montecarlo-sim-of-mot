@@ -19,7 +19,7 @@ public class DataAnalysis {
 			
 		try{
 			data = new Configurations();
-			file = new ObjectInputStream(new FileInputStream("simulation_data 1238982642011.dat"));
+			file = new ObjectInputStream(new FileInputStream("simulation_data 1239024042382.dat"));
 			data = (Configurations) file.readObject();
 			file.close();
 			
