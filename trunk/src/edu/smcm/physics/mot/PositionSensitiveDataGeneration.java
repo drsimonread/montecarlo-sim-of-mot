@@ -15,7 +15,8 @@ public class PositionSensitiveDataGeneration {
 	static final double I_Isat = 0.5;
 	static final double mass = 87.4678 * 1.661E-27;
 	static final double boltzman = 1.3806503E-23;
-	static final double term1 = h_bar * k * Gamma / 2; 
+	static final double term1 = h_bar * k * Gamma / 2;
+	static final double lifetime = 27e-9;
 	static double delta; 
 	static MyRandom rand = new MyRandom();
 
@@ -24,6 +25,7 @@ public class PositionSensitiveDataGeneration {
 		SimulationData data;
 		ObjectOutputStream file;
 		ArrayList<Double> velocities = new ArrayList<Double>();
+		ArrayList<Double> positions = new ArrayList<Double>();
 		Temperature initial_temp = new Temperature();
 		initial_temp.addKnownTemperature(1);
 		double initialVelocity;//initial_temp = 1, 	//units of Kelvin, then meters per second.
@@ -41,15 +43,20 @@ public class PositionSensitiveDataGeneration {
 //			System.out.println("Starting configuration " + s + ".");
 			delta = -3e6;//(0.5e6 + (s * step));
 			data = new SimulationData(delta, initial_temp.getTemperature());
+			double initialPosition = 0.0;
 			for(int i = 0; i < pt; i++){
 				initialVelocity = rand.nextGaussian(0, V_calc(initial_temp.getTemperature()));
 				velocities.add(initialVelocity);
+				positions.add(initialPosition);
+				double currentPosition = initialPosition;
 				
 				for(int j = 0; j < 30000; j++){
 					initialVelocity = senario(initialVelocity);
+					currentPosition = currentPosition + initialVelocity * lifetime;
+					System.out.println("Position = " + currentPosition);
 				}
 				
-				data.addVelocity(initialVelocity);
+				data.addParticle(initialVelocity, currentPosition);
 			}
 			configs.addConfiguration(data);
 			
