@@ -9,6 +9,7 @@ public class SimulationData implements Serializable, Iterable<Double>{
 	private double frequency;
 	private double temperature;
 	private ArrayList<Double> velocities;
+	private Particle particle;
 	
 	public SimulationData(Double detuning, Double initial_temp){
 		this.frequency = detuning;
@@ -18,6 +19,10 @@ public class SimulationData implements Serializable, Iterable<Double>{
 	
 	public void addVelocity(double velocity){
 		velocities.add(velocity);
+	}
+	
+	public void addParticle(double velocity, double position){
+		particle.addParticle(velocity, position);
 	}
 	
 	public double mean(){
@@ -35,11 +40,19 @@ public class SimulationData implements Serializable, Iterable<Double>{
 	}
 	
 	public int size(){
-		return velocities.size();
+		return particle.size();
 	}
 	
-	public double getValue(int index){
-		return velocities.get(index);
+	public double getVelocity(int index){
+		ArrayList<Double> temp  = new ArrayList<Double>();
+		temp = particle.getParticle(index);
+		return temp.get(0);
+	}
+	
+	public double getPosition(int index){
+		ArrayList<Double> temp  = new ArrayList<Double>();
+		temp = particle.getParticle(index);
+		return temp.get(1);
 	}
 	
 	public Iterator<Double> iterator(){
@@ -51,7 +64,7 @@ public class SimulationData implements Serializable, Iterable<Double>{
 	}
 	
 	public double getVelocity(){
-		return Equations.V_calc(temperature);
+		return PositionInsensitiveDataGeneration.V_calc(temperature);
 	}
 	
 	public double getAmplitude(){

@@ -18,7 +18,7 @@ public class Temperature {
 	}
 	
 	public void addKnownTemperature(double temperature){
-		stdDev = Equations.V_calc(temperature);
+		stdDev = PositionInsensitiveDataGeneration.V_calc(temperature);
 		tempList.add(temperature);
 	}
 	
