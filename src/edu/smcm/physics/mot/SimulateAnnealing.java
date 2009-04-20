@@ -30,7 +30,7 @@ public class SimulateAnnealing{
 //		System.out.println("Velocity  = " + data.getVelocity());
 //		System.out.println("Amplitude = " + data.getAmplitude());
 		
-		double[][]normalized_data = normalize(DataAnalysis.binnedData(data.toArray(), data.size()));
+		double[][]normalized_data = normalize(DataAnalysis.binnedData(data.toArray_velocity(), data.size()));
 		
 		double error = computeError(values, normalized_data);
 		System.out.println("Initial Error = " + error);
@@ -127,8 +127,8 @@ public class SimulateAnnealing{
 
 	private static double[] expCurve(ArrayList<Double> values){
 		double[] P_X = new double[range];
-		double i_min = DataAnalysis.min(data.toArray());
-		double i_max = DataAnalysis.max(data.toArray());
+		double i_min = DataAnalysis.min(data.toArray_velocity());
+		double i_max = DataAnalysis.max(data.toArray_velocity());
 		double step = (i_max-i_min)/range, A, B, C, V1, V2, V3, p1, p2, p3, v;
 		
 		V1 = values.get(0);
@@ -154,8 +154,8 @@ public class SimulateAnnealing{
 	}
 	
 	public double[][] to2DArray(){
-		double i_min = DataAnalysis.min(data.toArray());
-		double i_max = DataAnalysis.max(data.toArray());
+		double i_min = DataAnalysis.min(data.toArray_velocity());
+		double i_max = DataAnalysis.max(data.toArray_velocity());
 		double step = (i_max-i_min)/range;
 		double[][]twoD = new double[2][range];
 		
