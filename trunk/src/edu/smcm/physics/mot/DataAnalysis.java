@@ -16,10 +16,11 @@ public class DataAnalysis {
 		LineGraph myLine;
 		SimulateAnnealing SA;		
 		HillClimbing HC;
+		Particle p = new Particle();
 			
 		try{
 			data = new Configurations();
-			file = new ObjectInputStream(new FileInputStream("simulation_data 1239024042382.dat"));
+			file = new ObjectInputStream(new FileInputStream("simulation_data 1240197918393.dat"));
 			data = (Configurations) file.readObject();
 			file.close();
 			
@@ -27,19 +28,21 @@ public class DataAnalysis {
 				Sim = data.get(a);
 				System.out.println("simulation size is..." + Sim.size());
 
-				SA = new SimulateAnnealing(Sim);	
-				double [][]ann = new double[2][SA.size()];
-				ann = SA.to2DArray();
-				
-				HC = new HillClimbing(Sim);
-				double[][]hill = new double[2][HC.size()];
-				hill = HC.to2DArray();
+//				SA = new SimulateAnnealing(Sim);	
+//				double [][]ann = new double[2][SA.size()];
+//				ann = SA.to2DArray();
+//				
+//				HC = new HillClimbing(Sim);
+//				double[][]hill = new double[2][HC.size()];
+//				hill = HC.to2DArray();
 				
 				myLine = new LineGraph("Plot of Fitting Equation", "Velocity", "Probability");
-				myLine.addSeries("Fitted Line", ann);
-				myLine.addSeries("Hill Climbing", hill);
-				double[][] norm_data = normalize(binnedData(Sim.toArray(), Sim.size()));
-				myLine.addSeries("Data", norm_data);
+//				myLine.addSeries("Fitted Line", ann);
+//				myLine.addSeries("Hill Climbing", hill);
+//				double[][] norm_data = normalize(binnedData(Sim.toArray_velocity(), Sim.size()));
+//				myLine.addSeries("Data", norm_data);
+
+				myLine.addSeries("Position", Sim.toArray_position());
 				myLine.plotIT();
 				a = data.size();
 			}

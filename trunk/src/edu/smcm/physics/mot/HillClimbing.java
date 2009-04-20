@@ -16,7 +16,7 @@ public class HillClimbing {
 		range = data.size();
 		int max_iteration = 1000, iteration = 1;
 		ArrayList<Double> values = new ArrayList<Double>();
-		double[][]normalized_data = normalize(DataAnalysis.binnedData(data.toArray(), data.size()));
+		double[][]normalized_data = normalize(DataAnalysis.binnedData(data.toArray_velocity(), data.size()));
 		values = generateParameters();
 		double error = computeError(values, normalized_data);
 		System.out.println("Initial Error = " + error);
@@ -110,8 +110,8 @@ public class HillClimbing {
 
 	private static double[] expCurve(ArrayList<Double> values){
 		P_X = new double[range];
-		double i_min = DataAnalysis.min(data.toArray());//mydata[0]);
-		double i_max = DataAnalysis.max(data.toArray());//mydata[0]);
+		double i_min = DataAnalysis.min(data.toArray_velocity());//mydata[0]);
+		double i_max = DataAnalysis.max(data.toArray_velocity());//mydata[0]);
 		double step = (i_max-i_min)/range, A, B, C, V1, V2, V3, p1, p2, p3, v;
 		
 		V1 = values.get(0);
@@ -138,8 +138,8 @@ public class HillClimbing {
 	}
 	
 	public double[][] to2DArray(){
-		double i_min = DataAnalysis.min(data.toArray());
-		double i_max = DataAnalysis.max(data.toArray());
+		double i_min = DataAnalysis.min(data.toArray_velocity());
+		double i_max = DataAnalysis.max(data.toArray_velocity());
 		double step = (i_max-i_min)/range;
 		double[][]twoD = new double[2][range];
 		

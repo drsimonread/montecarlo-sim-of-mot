@@ -1,33 +1,37 @@
 package edu.smcm.physics.mot;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Particle {
+public class Particle implements Serializable{
+	private static final long serialVersionUID = 1L;
 	private double velocity;
 	private double position;
-	private ArrayList<Double> thisParticle; 
-	private ArrayList<ArrayList<Double>> particle;
+	private double[] thisParticle; 
+	private ArrayList<double[]> particle;
 	
 	public Particle (){
-		this.thisParticle = new ArrayList<Double>();
-		this.particle = new ArrayList<ArrayList<Double>>();
+		this.thisParticle = new double[2];
+		this.particle = new ArrayList<double[]>();
 	}
 	
-	public ArrayList<Double> getParticle(int index){
+	public double[] getParticle(int index){
 		return particle.get(index);
 	}
 	
-	public double getVelocity(){
-		return this.velocity;
+	public double getVelocity(int index){
+		double p[] = particle.get(index);
+		return p[0];
 	}
 	
-	public double getPosition(){
-		return this.position;
+	public double getPosition(int index){
+		double p[] = particle.get(index);
+		return p[1];
 	}
 	
-	private ArrayList<Double> addThisParticle(double velocity, double position){
-		thisParticle.add(velocity);
-		thisParticle.add(position);
+	private double[] addThisParticle(){
+		thisParticle[0] = velocity;
+		thisParticle[1] = position;
 		
 		return thisParticle;
 	}
@@ -36,7 +40,7 @@ public class Particle {
 		this.velocity = velocity;
 		this.position = position;
 		
-		particle.add(addThisParticle(velocity, position));
+		particle.add(addThisParticle());
 	}
 
 	public int size() {

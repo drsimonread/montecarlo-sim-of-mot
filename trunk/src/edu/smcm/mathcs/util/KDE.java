@@ -11,8 +11,8 @@ public class KDE {
 		data = data_;
 		int iMax = data.size();
 		double[][]KDE = new double[2][iMax];
-		double min = DataAnalysis.min(data.toArray());
-		double max = DataAnalysis.max(data.toArray());
+		double min = DataAnalysis.min(data.toArray_velocity());
+		double max = DataAnalysis.max(data.toArray_velocity());
 		double step = (max-min)/iMax;
 		for(int i = 0; i < iMax; i++){
 			t = min + i * step;
@@ -28,7 +28,7 @@ public class KDE {
 		double kernal = 0;
 		
 		for (int i = 0; i < i_max; i++){
-			kernal = kernal + 1/(Math.sqrt(2*Math.PI))*Math.exp(-square((t - data.getValue(i))/d_k)/2);
+			kernal = kernal + 1/(Math.sqrt(2*Math.PI))*Math.exp(-square((t - data.getVelocity(i))/d_k)/2);
 		}
 		return 1/(i_max*d_k)*kernal;
 	}
@@ -59,7 +59,7 @@ public class KDE {
 				next_nearest_rank = next_nearest_higher_rank;
 				next_nearest_higher_rank = next_nearest_higher_rank + 1;
 				
-			}else if(Math.abs(t-data.getValue(next_nearest_higher_rank)) > Math.abs(t-data.getValue(next_nearest_lower_rank))){
+			}else if(Math.abs(t-data.getVelocity(next_nearest_higher_rank)) > Math.abs(t-data.getVelocity(next_nearest_lower_rank))){
 				next_nearest_rank = next_nearest_lower_rank;
 				next_nearest_lower_rank = next_nearest_lower_rank - 1;
 				
@@ -68,7 +68,7 @@ public class KDE {
 				next_nearest_higher_rank = next_nearest_higher_rank + 1;
 			}
 		}
-		return t - data.getValue(next_nearest_rank);
+		return t - data.getVelocity(next_nearest_rank);
 	}
 	
 	private static int rank_of_nearest (double t){
@@ -80,7 +80,7 @@ public class KDE {
 			previous = i-1;
 		}
 		
-		if (Math.abs(t - data.getValue(i)) > (Math.abs(t - data.getValue(previous)))){
+		if (Math.abs(t - data.getVelocity(i)) > (Math.abs(t - data.getVelocity(previous)))){
 			i = i - 1;
 		}
 		return i;

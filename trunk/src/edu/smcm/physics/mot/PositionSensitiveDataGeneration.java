@@ -39,11 +39,11 @@ public class PositionSensitiveDataGeneration {
 		
 		
 //		for(int s = 0; s < 4; s++ ){
-			int pt = 100000;//(int) (1 * Math.pow(10, 2 + s));
+			int pt = 1000;//(int) (1 * Math.pow(10, 2 + s));
 //			System.out.println("Starting configuration " + s + ".");
 			delta = -3e6;//(0.5e6 + (s * step));
 			data = new SimulationData(delta, initial_temp.getTemperature());
-			double initialPosition = 0.0;
+			double initialPosition = rand.nextGaussian() * 2 - 1;
 			for(int i = 0; i < pt; i++){
 				initialVelocity = rand.nextGaussian(0, V_calc(initial_temp.getTemperature()));
 				velocities.add(initialVelocity);
@@ -53,7 +53,7 @@ public class PositionSensitiveDataGeneration {
 				for(int j = 0; j < 30000; j++){
 					initialVelocity = senario(initialVelocity);
 					currentPosition = currentPosition + initialVelocity * lifetime;
-					System.out.println("Position = " + currentPosition);
+//					System.out.println("Position = " + currentPosition);
 				}
 				
 				data.addParticle(initialVelocity, currentPosition);

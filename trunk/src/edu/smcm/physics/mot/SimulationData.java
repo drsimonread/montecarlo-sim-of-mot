@@ -15,14 +15,17 @@ public class SimulationData implements Serializable, Iterable<Double>{
 		this.frequency = detuning;
 		this.temperature = initial_temp;
 		this.velocities = new ArrayList<Double>();
+		particle = new Particle();
 	}
 	
 	public void addVelocity(double velocity){
+		particle.addParticle(velocity, 0.0);
 		velocities.add(velocity);
 	}
 	
 	public void addParticle(double velocity, double position){
 		particle.addParticle(velocity, position);
+		velocities.add(velocity);
 	}
 	
 	public double mean(){
@@ -44,15 +47,15 @@ public class SimulationData implements Serializable, Iterable<Double>{
 	}
 	
 	public double getVelocity(int index){
-		ArrayList<Double> temp  = new ArrayList<Double>();
+		double[] temp  = new double[2];
 		temp = particle.getParticle(index);
-		return temp.get(0);
+		return temp[0];
 	}
 	
 	public double getPosition(int index){
-		ArrayList<Double> temp  = new ArrayList<Double>();
+		double[] temp  = new double[2];
 		temp = particle.getParticle(index);
-		return temp.get(1);
+		return temp[1];
 	}
 	
 	public Iterator<Double> iterator(){
@@ -90,11 +93,41 @@ public class SimulationData implements Serializable, Iterable<Double>{
 		}
 	}
 	
-	public double[] toArray(){
-		double[] temp = new double[velocities.size()];
-		for(int i = 0; i < velocities.size(); i++){
-			temp[i] = velocities.get(i);
+	public double[] toArray_velocity(){
+		double temp[] = new double[particle.size()];
+		
+		for (int i = 0; i < particle.size(); i++){ 
+			temp[i] = particle.getVelocity(i);;
 		}
 		return temp;
+	}
+	
+	public double[][] toArray_position(){
+			System.out.println(particle.size());
+			double temp[][] = new double[2][particle.size()];
+			double p;
+			double max = 0,  min = 0, t;
+			
+			for(int i = 0; i < particle.size(); i++){
+				p = particle.getPosition(i);	
+				if (min > p){
+					min = p;
+				}
+				
+				if (max < p){
+					max = p;
+				}
+			}
+			
+			double step = (max - min)/particle.size();
+			
+			for(int i = 0; i < particle.size(); i++){
+				p = particle.getPosition(i);
+				temp[0][i] = min + step * i;
+				temp[1][i] = p;
+				System.out.println("pos = " + temp[1][i] + ", vel = " + temp[0][i]);
+			}
+			return temp;
+		
 	}
 }
