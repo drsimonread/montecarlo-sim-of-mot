@@ -20,7 +20,7 @@ public class DataAnalysis {
 			
 		try{
 			data = new Configurations();
-			file = new ObjectInputStream(new FileInputStream("simulation_data 1240197918393.dat"));
+			file = new ObjectInputStream(new FileInputStream("simulation_data 1240335898431.dat"));
 			data = (Configurations) file.readObject();
 			file.close();
 			
@@ -73,7 +73,7 @@ public class DataAnalysis {
 	public static double max(double[] doubles){
 		double max;
 		int i_max;
-		max = doubles[0];
+		max = 0;//doubles[0];
 		i_max = doubles.length;
 		for (int i = 0; i < i_max; i++){
 			if (doubles[i] > max) {

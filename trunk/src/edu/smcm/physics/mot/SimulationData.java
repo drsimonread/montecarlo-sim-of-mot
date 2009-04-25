@@ -9,23 +9,25 @@ public class SimulationData implements Serializable, Iterable<Double>{
 	private double frequency;
 	private double temperature;
 	private ArrayList<Double> velocities;
-	private Particle particle;
+	private ArrayList<Particle> particles;
+	private Particle p;
 	
 	public SimulationData(Double detuning, Double initial_temp){
 		this.frequency = detuning;
 		this.temperature = initial_temp;
 		this.velocities = new ArrayList<Double>();
-		particle = new Particle();
+		this.particles = new ArrayList<Particle>();
+		p = new Particle();
 	}
 	
 	public void addVelocity(double velocity){
-		particle.addParticle(velocity, 0.0);
+		p.addParticle(velocity, 0.0);
 		velocities.add(velocity);
 	}
 	
 	public void addParticle(double velocity, double position){
-		particle.addParticle(velocity, position);
-		velocities.add(velocity);
+		p.addParticle(velocity, position);
+		particles.add(p);
 	}
 	
 	public double mean(){
@@ -43,19 +45,15 @@ public class SimulationData implements Serializable, Iterable<Double>{
 	}
 	
 	public int size(){
-		return particle.size();
+		return particles.size();
 	}
 	
 	public double getVelocity(int index){
-		double[] temp  = new double[2];
-		temp = particle.getParticle(index);
-		return temp[0];
+		return particles.get(index).getVelocity();
 	}
 	
 	public double getPosition(int index){
-		double[] temp  = new double[2];
-		temp = particle.getParticle(index);
-		return temp[1];
+		return particles.get(index).getPosition();
 	}
 	
 	public Iterator<Double> iterator(){
@@ -94,22 +92,22 @@ public class SimulationData implements Serializable, Iterable<Double>{
 	}
 	
 	public double[] toArray_velocity(){
-		double temp[] = new double[particle.size()];
+		double temp[] = new double[particles.size()];
 		
-		for (int i = 0; i < particle.size(); i++){ 
-			temp[i] = particle.getVelocity(i);;
+		for (int i = 0; i < particles.size(); i++){ 
+			temp[i] = particles.get(i).getVelocity();
 		}
 		return temp;
 	}
 	
 	public double[][] toArray_position(){
-			System.out.println(particle.size());
-			double temp[][] = new double[2][particle.size()];
+			System.out.println(particles.size());
+			double temp[][] = new double[2][particles.size()];
 			double p;
-			double max = 0,  min = 0, t;
+			double max = 0,  min = 0;
 			
-			for(int i = 0; i < particle.size(); i++){
-				p = particle.getPosition(i);	
+			for(int i = 0; i < particles.size(); i++){
+				p = particles.get(i).getPosition();	
 				if (min > p){
 					min = p;
 				}
@@ -119,10 +117,10 @@ public class SimulationData implements Serializable, Iterable<Double>{
 				}
 			}
 			
-			double step = (max - min)/particle.size();
+			double step = (max - min)/particles.size();
 			
-			for(int i = 0; i < particle.size(); i++){
-				p = particle.getPosition(i);
+			for(int i = 0; i < particles.size(); i++){
+				p = particles.get(i).getPosition();
 				temp[0][i] = min + step * i;
 				temp[1][i] = p;
 				System.out.println("pos = " + temp[1][i] + ", vel = " + temp[0][i]);
