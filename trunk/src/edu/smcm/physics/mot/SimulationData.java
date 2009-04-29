@@ -23,6 +23,7 @@ public class SimulationData implements Serializable, Iterable<Double>{
 	public void addVelocity(double velocity){
 		p.addParticle(velocity, 0.0);
 		velocities.add(velocity);
+		particles.add(p);
 	}
 	
 	public void addParticle(double velocity, double position){
@@ -49,6 +50,7 @@ public class SimulationData implements Serializable, Iterable<Double>{
 	}
 	
 	public double getVelocity(int index){
+		System.out.println(particles.get(index).getVelocity());
 		return particles.get(index).getVelocity();
 	}
 	
@@ -123,7 +125,6 @@ public class SimulationData implements Serializable, Iterable<Double>{
 				p = particles.get(i).getPosition();
 				temp[0][i] = min + step * i;
 				temp[1][i] = p;
-				System.out.println("pos = " + temp[1][i] + ", vel = " + temp[0][i]);
 			}
 			return temp;
 		
