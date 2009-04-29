@@ -40,10 +40,10 @@ public class PositionInsensitiveDataGeneration{//Equations{
 		configs = new Configurations();
 		
 		
-//		for(int s = 0; s < 4; s++ ){
-			int pt = 100000;//(int) (1 * Math.pow(10, 2 + s));
+		for(int s = 0; s < 12; s++ ){
+			int pt = 10000;//(int) (1 * Math.pow(10, 2 + s));
 //			System.out.println("Starting configuration " + s + ".");
-			delta = -3e6;//(0.5e6 + (s * step));
+			delta = -(0.5e6 + (s * step));
 			data = new SimulationData(delta, initial_temp.getTemperature());
 			for(int i = 0; i < pt; i++){
 				initialVelocity = rand.nextGaussian(0, V_calc(initial_temp.getTemperature()));
@@ -60,10 +60,8 @@ public class PositionInsensitiveDataGeneration{//Equations{
 			end = System.nanoTime();
 			time =  ((end - start)/ 1e9)/60;
 			System.out.println("Run Time:  " + time + ".  Number of atoms " + pt);			
-//		}
+		}
 		
-
-
 		for (int i = 0; i < configs.size(); i++) {
 			data = configs.get(i);
 			System.out.println("Configuration " + i + " has " + data.size() + " simulations at a detuning of " + data.frequency() + ".");
@@ -71,9 +69,11 @@ public class PositionInsensitiveDataGeneration{//Equations{
 		}
 		
 		try{
-			file = new ObjectOutputStream(new FileOutputStream("simulation_data " + timeStamp + ".dat"));
+			String fileName = "simulation_data " + timeStamp + ".dat";
+			file = new ObjectOutputStream(new FileOutputStream(fileName));
 			file.writeObject(configs);
 			file.close();
+			CreateCSVFile f = new CreateCSVFile(fileName);
 		}catch(IOException caught){
 			System.err.println(caught);
 		}

@@ -20,7 +20,8 @@ public class DataAnalysis {
 			
 		try{
 			data = new Configurations();
-			file = new ObjectInputStream(new FileInputStream("simulation_data 1240335898431.dat"));
+			file = new ObjectInputStream(new FileInputStream("simulation_data 1240970506207.dat"));
+			CreateCSVFile csv = new CreateCSVFile("simulation_data 1240970506207.dat");
 			data = (Configurations) file.readObject();
 			file.close();
 			
@@ -43,8 +44,8 @@ public class DataAnalysis {
 //				myLine.addSeries("Data", norm_data);
 
 				myLine.addSeries("Position", Sim.toArray_position());
-				myLine.plotIT();
-				a = data.size();
+//				myLine.plotIT();
+//				a = data.size();
 			}
 			
 			System.out.println("DONE!");
