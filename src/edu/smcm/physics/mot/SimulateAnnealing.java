@@ -21,7 +21,7 @@ public class SimulateAnnealing{
 	
 	private ArrayList<Double> SA(SimulationData mySim){
 		data = mySim;
-		range = data.size();
+		range = data.numberOfParticles();
 		int max_iteration = 150, iteration = 1, cnt = 0;
 		ArrayList<Double> values = new ArrayList<Double>();
 		values = generateParameters();
@@ -30,7 +30,7 @@ public class SimulateAnnealing{
 //		System.out.println("Velocity  = " + data.getVelocity());
 //		System.out.println("Amplitude = " + data.getAmplitude());
 		
-		double[][]normalized_data = normalize(DataAnalysis.binnedData(data.toArray_velocity(), data.size()));
+		double[][]normalized_data = normalize(DataAnalysis.binnedData(data.toArray_velocity(), data.numberOfParticles()));
 		
 		double error = computeError(values, normalized_data);
 		System.out.println("Initial Error = " + error);
@@ -71,7 +71,7 @@ public class SimulateAnnealing{
 	private static ArrayList<Double> generateParameters(){
 		ArrayList<Double> somevalue = new ArrayList<Double>();
 		double V1 = data.getVelocity();//initial
-		double A = data.getAmplitude()/data.size();//initial
+		double A = data.getAmplitude()/data.numberOfParticles();//initial
 		double V2 = (2*V1/10);// * r.nextDouble();//missing
 		double B = A;// * r.nextDouble();//missing
 		double V3 = (V2/10) * r.nextDouble();//spike
@@ -88,14 +88,14 @@ public class SimulateAnnealing{
 	}
 	
 	private double[][] normalize(double [][] binned_data){ 
-		double[][] normalized_data = new double [2][data.size()];
+		double[][] normalized_data = new double [2][data.numberOfParticles()];
 		double Z = 0;
 		
-		for(int i = 0; i < data.size(); i++){
+		for(int i = 0; i < data.numberOfParticles(); i++){
 			Z = Z + binned_data[1][i];
 		}
 		
-		for (int i = 0; i < data.size(); i++){
+		for (int i = 0; i < data.numberOfParticles(); i++){
 			normalized_data[0][i] = binned_data[0][i];
 			normalized_data[1][i] = binned_data[1][i]/Z;
 		}

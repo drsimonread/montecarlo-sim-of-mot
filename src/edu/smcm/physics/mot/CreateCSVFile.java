@@ -26,7 +26,7 @@ public class CreateCSVFile {
 			
 			for(int a = 0; a < data.size(); a++){
 				Sim = data.get(a);
-				System.out.println("simulation " + a + "'s size is..." + Sim.size());
+				System.out.println("simulation " + a + "'s size is..." + Sim.numberOfParticles());
 				sendToCSV(Sim);
 			}
 			
@@ -42,9 +42,9 @@ public class CreateCSVFile {
 		PrintStream datafile;
 		try{
 			datafile = new PrintStream(new File("Simulation at " + -(int)s.frequency() + " Hz.csv"));
-			for(int j = 0; j < s.size(); j++){
-				datafile.println(s.getVelocity(j));
-				System.out.println(s.getVelocity(j));
+			for (Particle particle : s) {
+				datafile.println(particle.velocity());
+				System.out.println(particle.velocity());
 			}
 			
 			datafile.close();

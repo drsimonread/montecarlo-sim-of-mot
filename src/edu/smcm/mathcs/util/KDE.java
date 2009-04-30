@@ -9,7 +9,7 @@ public class KDE {
 	public static double[][] SmoothIt (SimulationData data_){
 		double t = 0;
 		data = data_;
-		int iMax = data.size();
+		int iMax = data.numberOfParticles();
 		double[][]KDE = new double[2][iMax];
 		double min = DataAnalysis.min(data.toArray_velocity());
 		double max = DataAnalysis.max(data.toArray_velocity());
@@ -23,7 +23,7 @@ public class KDE {
 	}
 
 	private static double f_hat(double t){
-		int i_max = data.size();
+		int i_max = data.numberOfParticles();
 		double d_k = D_kofT(k(), t);
 		double kernal = 0;
 		
@@ -34,7 +34,7 @@ public class KDE {
 	}
 	
 	private static int k (){
-		int kth = (int)Math.sqrt(data.size());
+		int kth = (int)Math.sqrt(data.numberOfParticles());
 		return kth;
 	}
 	
@@ -46,7 +46,7 @@ public class KDE {
 		int next_nearest_rank = 0;
 		
 		for(int j = 0; j < k; j++){
-			boolean no_higher = next_nearest_higher_rank >= data.size();
+			boolean no_higher = next_nearest_higher_rank >= data.numberOfParticles();
 			boolean no_lower = next_nearest_lower_rank < 0;
 			
 			if(no_higher && no_lower){

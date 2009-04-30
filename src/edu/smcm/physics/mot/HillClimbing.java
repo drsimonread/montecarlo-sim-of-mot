@@ -13,10 +13,10 @@ public class HillClimbing {
 
 	public HillClimbing(SimulationData Sim){
 		data = Sim;
-		range = data.size();
+		range = data.numberOfParticles();
 		int max_iteration = 1000, iteration = 1;
 		ArrayList<Double> values = new ArrayList<Double>();
-		double[][]normalized_data = normalize(DataAnalysis.binnedData(data.toArray_velocity(), data.size()));
+		double[][]normalized_data = normalize(DataAnalysis.binnedData(data.toArray_velocity(), data.numberOfParticles()));
 		values = generateParameters();
 		double error = computeError(values, normalized_data);
 		System.out.println("Initial Error = " + error);
@@ -61,14 +61,15 @@ public class HillClimbing {
 	}
 	
 	private double[][] normalize(double [][] binned_data){ 
-		double[][] normalized_data = new double [2][data.size()];
-		double Z = 0;
+		double[][] normalized_data = new double [2][data.numberOfParticles()];
+		double Z;
 		
-		for(int i = 0; i < data.size(); i++){
+		Z = 0;
+		for(int i = 0; i < data.numberOfParticles(); i++){
 			Z = Z + binned_data[1][i];
 		}
 		
-		for (int i = 0; i < data.size(); i++){
+		for (int i = 0; i < data.numberOfParticles(); i++){
 			normalized_data[0][i] = binned_data[0][i];
 			normalized_data[1][i] = binned_data[1][i]/Z;
 		}
@@ -78,7 +79,7 @@ public class HillClimbing {
 	private static ArrayList<Double> generateParameters(){
 		ArrayList<Double> somevalue = new ArrayList<Double>();
 		double V1 = data.getVelocity();
-		double A = data.getAmplitude()/data.size();
+		double A = data.getAmplitude()/data.numberOfParticles();
 		
 		double V2 = 2*V1/10;
 		double B = A;

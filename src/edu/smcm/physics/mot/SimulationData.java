@@ -4,66 +4,54 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
-public class SimulationData implements Serializable, Iterable<Double>{
+public class SimulationData implements Serializable, Iterable<Particle>{
 	private static final long serialVersionUID = 1L;
 	private double frequency;
 	private double temperature;
-	private ArrayList<Double> velocities;
 	private ArrayList<Particle> particles;
-	private Particle p;
 	
 	public SimulationData(Double detuning, Double initial_temp){
 		this.frequency = detuning;
 		this.temperature = initial_temp;
-		this.velocities = new ArrayList<Double>();
 		this.particles = new ArrayList<Particle>();
-		p = new Particle();
+	}
+		
+	public void addParticle(Particle particle){
+		particles.add(particle);
 	}
 	
-	public void addVelocity(double velocity){
-		p.addParticle(velocity, 0.0);
-		velocities.add(velocity);
-		particles.add(p);
-	}
-	
-	public void addParticle(double velocity, double position){
-		p.addParticle(velocity, position);
-		particles.add(p);
-	}
-	
-	public double mean(){
+	public double meanVelocity(){
 		double total;
 		
 		total = 0.0;
-		for (Double velocity : velocities){
-			total = total + velocity;
+		for (Particle particle : particles) {
+			total = total + particle.velocity();
 		}
-		return total / velocities.size();
+		return total / particles.size();
 	}
 	
 	public double frequency(){
 		return this.frequency;
 	}
 	
-	public int size(){
+	public int numberOfParticles(){
 		return particles.size();
 	}
 	
 	public double getVelocity(int index){
-		System.out.println(particles.get(index).getVelocity());
-		return particles.get(index).getVelocity();
+		return particles.get(index).velocity();
 	}
 	
 	public double getPosition(int index){
-		return particles.get(index).getPosition();
+		return particles.get(index).position();
 	}
 	
-	public Iterator<Double> iterator(){
-		return velocities.iterator(); 
+	public Iterator<Particle> iterator(){
+		return particles.iterator(); 
 	}
 	
 	public void sort(){
-		Collections.sort(velocities);
+		Collections.sort(particles);
 	}
 	
 	public double getVelocity(){
@@ -72,32 +60,28 @@ public class SimulationData implements Serializable, Iterable<Double>{
 	
 	public double getAmplitude(){
 		double amp;
-		int size = velocities.size();
-		double[] arr = new double[size];
+		double[] arr = new double[numberOfParticles()];
 		
-		for (int i = 0; i < size; i++){
-			arr[i] = velocities.get(i);
+		for (int i = 0; i < numberOfParticles(); i++){
+			arr[i] = particles.get(i).velocity();
 		}
 		
-		amp = DataAnalysis.max(DataAnalysis.binnedData(arr, size)[1]);
+		amp = DataAnalysis.max(DataAnalysis.binnedData(arr, numberOfParticles())[1]);
 		
 		return amp;
 	}
 	
+	// TODO Examine the design associated with this function and KDE
 	public int binarySearch(double t){
-		int i = Collections.binarySearch(velocities, t); 
-		if (i == 0){
-			return i;
-		}else{
-			return Math.abs(i)-1;
-		}
+		assert (false);
+		return 0;
 	}
 	
 	public double[] toArray_velocity(){
 		double temp[] = new double[particles.size()];
 		
 		for (int i = 0; i < particles.size(); i++){ 
-			temp[i] = particles.get(i).getVelocity();
+			temp[i] = particles.get(i).velocity();
 		}
 		return temp;
 	}
@@ -109,7 +93,7 @@ public class SimulationData implements Serializable, Iterable<Double>{
 			double max = 0,  min = 0;
 			
 			for(int i = 0; i < particles.size(); i++){
-				p = particles.get(i).getPosition();	
+				p = particles.get(i).position();	
 				if (min > p){
 					min = p;
 				}
@@ -122,7 +106,7 @@ public class SimulationData implements Serializable, Iterable<Double>{
 			double step = (max - min)/particles.size();
 			
 			for(int i = 0; i < particles.size(); i++){
-				p = particles.get(i).getPosition();
+				p = particles.get(i).position();
 				temp[0][i] = min + step * i;
 				temp[1][i] = p;
 			}

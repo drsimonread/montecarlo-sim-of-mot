@@ -30,7 +30,7 @@ public class PositionSensitiveDataGeneration {
 		ArrayList<Double> positions = new ArrayList<Double>();
 		Temperature initial_temp = new Temperature();
 		initial_temp.addKnownTemperature(1);
-		double initialVelocity;//initial_temp = 1, 	//units of Kelvin, then meters per second.
+		double velocity;//initial_temp = 1, 	//units of Kelvin, then meters per second.
 		long start, end;
 		double time;
 		start = System.nanoTime();
@@ -38,7 +38,7 @@ public class PositionSensitiveDataGeneration {
 		long timeStamp = rightNow.getTimeInMillis();
 		double step = 0.5e6;
 		configs = new Configurations();
-		double initialPosition;		
+		double position;		
 		
 //		for(int s = 0; s < 4; s++ ){
 			int pt = 1000;//(int) (1 * Math.pow(10, 2 + s));
@@ -47,18 +47,18 @@ public class PositionSensitiveDataGeneration {
 			data = new SimulationData(delta, initial_temp.getTemperature());
 			
 			for(int i = 0; i < pt; i++){
-				initialVelocity = rand.nextGaussian(0, V_calc(initial_temp.getTemperature()));
-				initialPosition = rand.nextGaussian(0, 0.001);
-				velocities.add(initialVelocity);
-				positions.add(initialPosition);
+				velocity = rand.nextGaussian(0, V_calc(initial_temp.getTemperature()));
+				position = rand.nextGaussian(0, 0.001);
+				velocities.add(velocity);
+				positions.add(position);
 				
 				for(int j = 0; j < 30000; j++){
-					initialVelocity = senario(initialVelocity);
-					initialPosition = initialPosition + initialVelocity * timeStep;
+					velocity = senario(velocity);
+					position = position + velocity * timeStep;
 //					System.out.println("Position = " + initialPosition);
 				}
 				
-				data.addParticle(initialVelocity, initialPosition);
+				data.addParticle(new Particle(velocity, position));
 			}
 			configs.addConfiguration(data);
 			
@@ -71,7 +71,7 @@ public class PositionSensitiveDataGeneration {
 
 		for (int i = 0; i < configs.size(); i++) {
 			data = configs.get(i);
-			System.out.println("Configuration " + i + " has " + data.size() + " simulations at a detuning of " + data.frequency() + ".");
+			System.out.println("Configuration " + i + " has " + data.numberOfParticles() + " simulations at a detuning of " + data.frequency() + ".");
 			System.out.println("And has an amplitude of " + data.getAmplitude() + "and an initial velocity of " + data.getVelocity() + ".");
 		}
 		
