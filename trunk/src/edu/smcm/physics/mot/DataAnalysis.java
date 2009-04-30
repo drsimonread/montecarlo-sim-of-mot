@@ -16,7 +16,6 @@ public class DataAnalysis {
 		LineGraph myLine;
 		SimulateAnnealing SA;		
 		HillClimbing HC;
-		Particle p = new Particle();
 			
 		try{
 			data = new Configurations();
@@ -27,7 +26,7 @@ public class DataAnalysis {
 			
 			for(int a = 0; a < data.size(); a++){
 				Sim = data.get(a);
-				System.out.println("simulation size is..." + Sim.size());
+				System.out.println("simulation size is..." + Sim.numberOfParticles());
 
 //				SA = new SimulateAnnealing(Sim);	
 //				double [][]ann = new double[2][SA.size()];

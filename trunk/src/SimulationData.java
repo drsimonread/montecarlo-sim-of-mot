@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
+import edu.smcm.physics.mot.Particle;
+
 public class SimulationData 
 extends edu.smcm.physics.mot.SimulationData
-implements Serializable, Iterable<Double>{
+implements Serializable, Iterable<Particle>{
 	private static final long serialVersionUID = 1L;
 	private double frequency;
 	private double temperature;
@@ -20,7 +22,7 @@ implements Serializable, Iterable<Double>{
 		velocities.add(velocity);
 	}
 	
-	public double mean(){
+	public double meanVelocity(){
 		double total;
 		
 		total = 0.0;
@@ -42,9 +44,9 @@ implements Serializable, Iterable<Double>{
 		return velocities.get(index);
 	}
 	
-	public Iterator<Double> iterator(){
-		return velocities.iterator(); 
-	}
+//	public Iterator<Particle> iterator(){
+//		return 0;//particles.iterator();  
+//	}
 	
 	public void sort(){
 		Collections.sort(velocities);

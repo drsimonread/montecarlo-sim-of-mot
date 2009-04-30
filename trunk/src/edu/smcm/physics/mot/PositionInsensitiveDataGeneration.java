@@ -30,7 +30,7 @@ public class PositionInsensitiveDataGeneration{//Equations{
 		ArrayList<Double> velocities = new ArrayList<Double>();
 		Temperature initial_temp = new Temperature();
 		initial_temp.addKnownTemperature(1);
-		double initialVelocity;//initial_temp = 1, 	//units of Kelvin, then meters per second.
+		double velocity;//initial_temp = 1, 	//units of Kelvin, then meters per second.
 		long start, end;
 		double time;
 		start = System.nanoTime();
@@ -40,20 +40,20 @@ public class PositionInsensitiveDataGeneration{//Equations{
 		configs = new Configurations();
 		
 		
-		for(int s = 0; s < 12; s++ ){
-			int pt = 10000;//(int) (1 * Math.pow(10, 2 + s));
+		for(int s = 0; s < 5; s++ ){
+			int pt = (int) (1 * Math.pow(10, 2 + s));
 //			System.out.println("Starting configuration " + s + ".");
-			delta = -(0.5e6 + (s * step));
+			delta = -3e6;//(0.5e6 + (s * step));
 			data = new SimulationData(delta, initial_temp.getTemperature());
 			for(int i = 0; i < pt; i++){
-				initialVelocity = rand.nextGaussian(0, V_calc(initial_temp.getTemperature()));
-				velocities.add(initialVelocity);
+				velocity = rand.nextGaussian(0, V_calc(initial_temp.getTemperature()));
+				velocities.add(velocity);
 				
 				for(int j = 0; j < 30000; j++){
-					initialVelocity = senario(initialVelocity);
+					velocity = senario(velocity);
 				}
 				
-				data.addVelocity(initialVelocity);
+				data.addParticle(new Particle(velocity, 0.0));
 			}
 			configs.addConfiguration(data);
 			
@@ -64,7 +64,7 @@ public class PositionInsensitiveDataGeneration{//Equations{
 		
 		for (int i = 0; i < configs.size(); i++) {
 			data = configs.get(i);
-			System.out.println("Configuration " + i + " has " + data.size() + " simulations at a detuning of " + data.frequency() + ".");
+			System.out.println("Configuration " + i + " has " + data.numberOfParticles() + " simulations at a detuning of " + data.frequency() + ".");
 			System.out.println("And has an amplitude of " + data.getAmplitude() + "and an initial velocity of " + data.getVelocity() + ".");
 		}
 		
@@ -73,7 +73,7 @@ public class PositionInsensitiveDataGeneration{//Equations{
 			file = new ObjectOutputStream(new FileOutputStream(fileName));
 			file.writeObject(configs);
 			file.close();
-			CreateCSVFile f = new CreateCSVFile(fileName);
+//			CreateCSVFile f = new CreateCSVFile(fileName);
 		}catch(IOException caught){
 			System.err.println(caught);
 		}
