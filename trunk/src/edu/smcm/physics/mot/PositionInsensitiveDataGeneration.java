@@ -39,14 +39,13 @@ public class PositionInsensitiveDataGeneration{//Equations{
 		double step = 0.5e6;
 		configs = new Configurations();
 		
-		
-		for(int s = 0; s < 5; s++ ){
-			int pt = (int) (1 * Math.pow(10, 2 + s));
+		for(int s = 0; s < 1; s++ ){
+			int pt = 1;//(int) (1 * Math.pow(10, 2 + s));
 //			System.out.println("Starting configuration " + s + ".");
 			delta = -3e6;//(0.5e6 + (s * step));
 			data = new SimulationData(delta, initial_temp.getTemperature());
 			for(int i = 0; i < pt; i++){
-				velocity = rand.nextGaussian(0, V_calc(initial_temp.getTemperature()));
+				velocity = 1;//rand.nextGaussian(0, V_calc(initial_temp.getTemperature()));
 				velocities.add(velocity);
 				
 				for(int j = 0; j < 30000; j++){
